@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda da PT - AION 2 | Cronograma & Gestão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- GunDB Realtime Peer-to-Peer Cloud Database (Zero Setup) -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient background graphics -->
+  <div class="bg-fx">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="header-brand">
+        <div class="logo-shield">
+          <span class="logo-icon">⚔️</span>
+        </div>
+        <div>
+          <div class="sub-badge">CENTRAL DE OPERAÇÕES • ATREIA</div>
+          <h1>AGENDA DA PT <span class="accent-text">AION 2</span></h1>
+        </div>
+      </div>
+
+      <!-- Top Tools: Realtime Cloud Status, Windows Alarm & User Login -->
+      <div class="header-controls">
+        <!-- Realtime Cloud Connection Status -->
+        <button class="control-btn db-btn" onclick="AionAgenda.openSyncInfoModal()" title="Status da Nuvem e Banco de Dados Automático">
+          <span class="status-indicator connected" id="db-status-dot"></span>
+          <span id="db-status-label">Nuvem: Conectada 🟢</span>
+        </button>
+
+        <!-- Windows Alarm Toggle & Test -->
+        <div class="alarm-controls-box">
+          <button id="alarm-toggle-btn" class="control-btn alarm-btn active" onclick="AionAgenda.toggleWindowsAlarm()" title="Ativar/Desativar apito no Windows">
+            🔔 Alarme Windows: ON
+          </button>
+          <button class="control-btn test-btn" onclick="AionAgenda.testWindowsAlarm()" title="Testar apito sonoro e notificação no Windows">
+            🔊 Testar Apito
+          </button>
+        </div>
+
+        <!-- User Login Pill / Button -->
+        <div id="auth-box" class="auth-box">
+          <button class="control-btn login-btn" onclick="AionAgenda.openLoginModal()">
+            🔑 Entrar como Jogador
+          </button>
+        </div>
+      </div>
+
+      <div class="header-status-card">
+        <div class="live-clock-box">
+          <span class="live-dot"></span>
+          <span id="current-day-name">Carregando...</span>
+          <span class="time-display" id="live-clock">00:00:00</span>
+        </div>
+        <div class="next-event-banner" id="next-event-banner">
+          <span class="banner-label">PRÓXIMO EVENTO:</span>
+          <span class="banner-value" id="next-event-title">Calculando...</span>
+          <span class="banner-countdown" id="next-event-countdown">--:--</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Quick Navigation / Stats Bar -->
+    <nav class="quick-nav">
+      <div class="nav-pills">
+        <button class="nav-pill active" data-tab="semana">📅 Cronograma Semanal</button>
+        <button class="nav-pill" data-tab="membros">🛡️ Guerreiros & Alts</button>
+        <button class="nav-pill" data-tab="builder">⚔️ Simulador de PT (Alts)</button>
+        <button class="nav-pill" data-tab="checkin">✅ Check-in Diário & DGs</button>
+        <button class="nav-pill" data-tab="avisos">📜 Mural de Avisos</button>
+      </div>
+
+      <div class="sound-toggle-box">
+        <button id="sound-btn" class="icon-btn" onclick="AionAgenda.toggleSound()" title="Alternar efeitos sonoros da página">🔊 Efeitos: ON</button>
+      </div>
+    </nav>
+
+    <!-- TAB 1: CRONOGRAMA SEMANAL -->
+    <section id="tab-semana" class="tab-content active">
+      <div class="section-title-bar">
+        <div>
+          <h2>CRONOGRAMA DE OPERAÇÕES DA SEMANA</h2>
+          <p class="section-desc">Grade de compromissos oficiais da PT: Dungeons sagradas, Abismo diário e progressão de Alts.</p>
+        </div>
+        <div class="quick-rules-badge">
+          <span>🎯 <strong>Horário Nobre:</strong> 19:00</span>
+          <span>🌌 <strong>Abismo em Grupo:</strong> 16:00 (1h)</span>
+        </div>
+      </div>
+
+      <!-- Weekly Schedule Grid -->
+      <div class="week-grid" id="week-grid">
+        <!-- Monday -->
+        <div class="day-card" data-day="1">
+          <div class="day-header">
+            <span class="day-code">SEG</span>
+            <span class="day-title">Segunda-feira</span>
+            <span class="day-badge alt-badge">Alts Day</span>
+          </div>
+          <div class="day-body">
+            <div class="event-item abyss">
+              <span class="event-time">16:00</span>
+              <div class="event-info">
+                <strong>Abismo em Grupo</strong>
+                <span>Foco: 1 hora de farm / PvP rápido</span>
+              </div>
+            </div>
+            <div class="event-item alts">
+              <span class="event-time highlight">19:00</span>
+              <div class="event-info">
+                <strong>UPAR ALTS EM GRUPO 🚀</strong>
+                <span>Missões de grupo, grind e leveling dos alts</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer">
+            <span class="presence-hint">PT Completa às 19h</span>
+          </div>
+        </div>
+
+        <!-- Tuesday -->
+        <div class="day-card" data-day="2">
+          <div class="day-header">
+            <span class="day-code">TER</span>
+            <span class="day-title">Terça-feira</span>
+            <span class="day-badge alt-badge">Alts Day</span>
+          </div>
+          <div class="day-body">
+            <div class="event-item abyss">
+              <span class="event-time">16:00</span>
+              <div class="event-info">
+                <strong>Abismo em Grupo</strong>
+                <span>Foco: AP Farm & Quest diária</span>
+              </div>
+            </div>
+            <div class="event-item alts">
+              <span class="event-time highlight">19:00</span>
+              <div class="event-info">
+                <strong>UPAR ALTS EM GRUPO 🚀</strong>
+                <span>Alinhamento de nível e preparo para reset</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer">
+            <span class="presence-hint">PT Completa às 19h</span>
+          </div>
+        </div>
+
+        <!-- Wednesday -->
+        <div class="day-card dg-focus" data-day="3">
+          <div class="day-header">
+            <span class="day-code">QUA</span>
+            <span class="day-title">Quarta-feira</span>
+            <span class="day-badge dg-badge">🔥 DIA DE DG</span>
+          </div>
+          <div class="day-body">
+            <div class="event-item abyss">
+              <span class="event-time">16:00</span>
+              <div class="event-info">
+                <strong>Abismo em Grupo</strong>
+                <span>1 hora diária de Abismo</span>
+              </div>
+            </div>
+            <div class="event-item dungeon">
+              <span class="event-time highlight-dg">19:00</span>
+              <div class="event-info">
+                <strong>DUNGEONS OFICIAIS DA PT 🏰</strong>
+                <span>Rotação de Mains: Kharnoxy, Hell, CIROC & Rafax</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer prime">
+            <span class="presence-hint">Presença Obrigatória (Mains)</span>
+          </div>
+        </div>
+
+        <!-- Thursday -->
+        <div class="day-card dg-focus" data-day="4">
+          <div class="day-header">
+            <span class="day-code">QUI</span>
+            <span class="day-title">Quinta-feira</span>
+            <span class="day-badge dg-badge">🔥 DIA DE DG</span>
+          </div>
+          <div class="day-body">
+            <div class="event-item abyss">
+              <span class="event-time">16:00</span>
+              <div class="event-info">
+                <strong>Abismo em Grupo</strong>
+                <span>1 hora diária de Abismo</span>
+              </div>
+            </div>
+            <div class="event-item dungeon">
+              <span class="event-time highlight-dg">19:00</span>
+              <div class="event-info">
+                <strong>DUNGEONS OFICIAIS DA PT 🏰</strong>
+                <span>Farm de drops raros & progressão end-game</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer prime">
+            <span class="presence-hint">Presença Obrigatória (Mains)</span>
+          </div>
+        </div>
+
+        <!-- Friday -->
+        <div class="day-card dg-focus" data-day="5">
+          <div class="day-header">
+            <span class="day-code">SEX</span>
+            <span class="day-title">Sexta-feira</span>
+            <span class="day-badge dg-badge">🔥 DIA DE DG</span>
+          </div>
+          <div class="day-body">
+            <div class="event-item abyss">
+              <span class="event-time">16:00</span>
+              <div class="event-info">
+                <strong>Abismo em Grupo</strong>
+                <span>Aquecimento pré-dungeon</span>
+              </div>
+            </div>
+            <div class="event-item dungeon">
+              <span class="event-time highlight-dg">19:00</span>
+              <div class="event-info">
+                <strong>DUNGEONS OFICIAIS (SEXTOU) 🏰🍻</strong>
+                <span>Fechamento do bloco semanal de DGs principais</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer prime">
+            <span class="presence-hint">Presença Obrigatória (Mains)</span>
+          </div>
+        </div>
+
+        <!-- Saturday -->
+        <div class="day-card weekend" data-day="6">
+          <div class="day-header">
+            <span class="day-code">SÁB</span>
+            <span class="day-title">Sábado</span>
+            <span class="day-badge flex-badge">Flexível</span>
+          </div>
+          <div class="day-body">
+            <div class="weekend-alert">
+              <span class="alert-icon">⚠️</span>
+              <p><strong>Kharnoxy & CIROC:</strong> Podem sair ou estar off.</p>
+            </div>
+            <div class="event-item free">
+              <span class="event-time">LIVRE</span>
+              <div class="event-info">
+                <strong>Up de Alts / Farm Solo</strong>
+                <span>Hell & Rafax lideram conteúdo solo ou up de alts</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer">
+            <span class="presence-hint">Se todos estiverem ON: Bônus Run</span>
+          </div>
+        </div>
+
+        <!-- Sunday -->
+        <div class="day-card weekend" data-day="0">
+          <div class="day-header">
+            <span class="day-code">DOM</span>
+            <span class="day-title">Domingo</span>
+            <span class="day-badge flex-badge">Flexível</span>
+          </div>
+          <div class="day-body">
+            <div class="weekend-alert">
+              <span class="alert-icon">⚠️</span>
+              <p><strong>Kharnoxy & CIROC:</strong> Podem sair ou estar off.</p>
+            </div>
+            <div class="event-item free">
+              <span class="event-time">LIVRE</span>
+              <div class="event-info">
+                <strong>Crafting & Preparação</strong>
+                <span>Alts, mercado, farm e organizar a próxima semana</span>
+              </div>
+            </div>
+          </div>
+          <div class="day-footer">
+            <span class="presence-hint">Descanso ou grind opcional</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: MEMBROS & ALTS -->
+    <section id="tab-membros" class="tab-content">
+      <div class="section-title-bar">
+        <div>
+          <h2>FORMAÇÃO DA PT: OS 4 JOGADORES</h2>
+          <p class="section-desc">Rotina da vida real, horários disponíveis, restrições e catálogo de personagens.</p>
+        </div>
+      </div>
+
+      <div class="members-grid">
+        <!-- KHARNOXY -->
+        <div class="member-card you-card">
+          <div class="member-card-header">
+            <div class="avatar-ring tank-ring">🛡️</div>
+            <div class="member-titles">
+              <div class="tag-row">
+                <span class="badge-role tank">TANK MAIN</span>
+                <span class="badge-you">VOCÊ</span>
+              </div>
+              <h3>Kharnoxy</h3>
+              <span class="class-label">Templário (Tanker)</span>
+            </div>
+          </div>
+
+          <div class="member-info-section">
+            <div class="info-row">
+              <span class="info-label">💼 Vida Real:</span>
+              <span class="info-val">Programador (Home Office)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">⏰ Disponibilidade:</span>
+              <span class="info-val">19:00 (Geralmente livre)</span>
+            </div>
+            <div class="info-row warning-row">
+              <span class="info-label">⚠️ Atenção:</span>
+              <span class="info-val">Às vezes precisa ir presencial ao escritório. Sáb/Dom pode sair.</span>
+            </div>
+          </div>
+
+          <div class="alts-box">
+            <div class="alts-header">PERSONAGENS ALTS:</div>
+            <div class="alt-pills">
+              <span class="alt-pill dps">🔮 1x Mago</span>
+              <span class="alt-pill heal">🌿 1x Healer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CIROC -->
+        <div class="member-card">
+          <div class="member-card-header">
+            <div class="avatar-ring dps-ring">🔮</div>
+            <div class="member-titles">
+              <div class="tag-row">
+                <span class="badge-role dps">DPS MAIN</span>
+              </div>
+              <h3>CIROC</h3>
+              <span class="class-label">Mago (Sorcerer / Burst)</span>
+            </div>
+          </div>
+
+          <div class="member-info-section">
+            <div class="info-row">
+              <span class="info-label">💼 Vida Real:</span>
+              <span class="info-val">Trabalho Presencial (Chega 15:00)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">⏰ Disponibilidade:</span>
+              <span class="info-val">15:00 em diante (Tarde & Noite livres)</span>
+            </div>
+            <div class="info-row warning-row">
+              <span class="info-label">⚠️ Atenção:</span>
+              <span class="info-val">Sábado e Domingo às vezes sai ou não joga.</span>
+            </div>
+          </div>
+
+          <div class="alts-box">
+            <div class="alts-header">PERSONAGENS ALTS:</div>
+            <div class="alt-pills">
+              <span class="alt-pill heal">🌿 2x Healer</span>
+              <span class="alt-pill dps">🔮 1x Mago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- HELL -->
+        <div class="member-card">
+          <div class="member-card-header">
+            <div class="avatar-ring heal-ring">🌿</div>
+            <div class="member-titles">
+              <div class="tag-row">
+                <span class="badge-role heal">HEALER MAIN</span>
+              </div>
+              <h3>Hell</h3>
+              <span class="class-label">Healer (Clérigo / Suporte)</span>
+            </div>
+          </div>
+
+          <div class="member-info-section">
+            <div class="info-row">
+              <span class="info-label">💼 Vida Real:</span>
+              <span class="info-val">Aposentado (Full Time Gamer)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">⏰ Disponibilidade:</span>
+              <span class="info-val">Livre maior parte do dia</span>
+            </div>
+            <div class="info-row restriction-row">
+              <span class="info-label">🚫 Bloqueio Fixo:</span>
+              <span class="info-val"><strong>22:00 às 00:00</strong> (Joga Raven Online)</span>
+            </div>
+          </div>
+
+          <div class="alts-box">
+            <div class="alts-header">PERSONAGENS ALTS:</div>
+            <div class="alt-pills">
+              <span class="alt-pill heal">🌿 1x Healer</span>
+              <span class="alt-pill dps">🔮 1x Mago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RAFAXDWAR -->
+        <div class="member-card">
+          <div class="member-card-header">
+            <div class="avatar-ring dps-ring">⚔️</div>
+            <div class="member-titles">
+              <div class="tag-row">
+                <span class="badge-role dps">DPS / FLEX</span>
+              </div>
+              <h3>Rafaxdwar</h3>
+              <span class="class-label">Guerreiro & Streamer</span>
+            </div>
+          </div>
+
+          <div class="member-info-section">
+            <div class="info-row">
+              <span class="info-label">💼 Vida Real:</span>
+              <span class="info-val">Streamer & Pai de Família 👶</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">⏰ Disponibilidade:</span>
+              <span class="info-val"><strong>19:00</strong> é o horário perfeito</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">📅 Finais de Semana:</span>
+              <span class="info-val">Disponível para upar alts e farmar.</span>
+            </div>
+          </div>
+
+          <div class="alts-box">
+            <div class="alts-header">PERSONAGENS ALTS:</div>
+            <div class="alt-pills">
+              <span class="alt-pill tank">🛡️ 1x Templário</span>
+              <span class="alt-pill dps">⚔️ 1x Gladiador</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SIMULADOR DE COMPOSIÇÃO DE ALTS -->
+    <section id="tab-builder" class="tab-content">
+      <div class="section-title-bar">
+        <div>
+          <h2>SIMULADOR DE COMPOSIÇÃO DE ALTS (SEG & TER)</h2>
+          <p class="section-desc">Nos dias de Alts (ou FDS), monte a rotação perfeita de 4 pessoas balanceando Tank, Healer e DPS.</p>
+        </div>
+      </div>
+
+      <div class="builder-container">
+        <div class="builder-slots">
+          <!-- Slot Kharnoxy -->
+          <div class="slot-box">
+            <div class="slot-header">
+              <span class="slot-player">Kharnoxy</span>
+              <span class="slot-type">Main: Templário</span>
+            </div>
+            <div class="slot-select">
+              <label>Escolher Personagem:</label>
+              <select id="select-kharnoxy" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
+                <option value="Kharnoxy - Templário (Tank)" data-role="tank">🛡️ Main: Templário (Tank)</option>
+                <option value="Kharnoxy - Mago (DPS)" data-role="dps" selected>🔮 Alt: Mago (DPS)</option>
+                <option value="Kharnoxy - Healer (Suporte)" data-role="heal">🌿 Alt: Healer (Suporte)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Slot CIROC -->
+          <div class="slot-box">
+            <div class="slot-header">
+              <span class="slot-player">CIROC</span>
+              <span class="slot-type">Main: Mago</span>
+            </div>
+            <div class="slot-select">
+              <label>Escolher Personagem:</label>
+              <select id="select-ciroc" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
+                <option value="CIROC - Mago (DPS)" data-role="dps">🔮 Main: Mago (DPS)</option>
+                <option value="CIROC - Healer 1 (Suporte)" data-role="heal" selected>🌿 Alt 1: Healer (Suporte)</option>
+                <option value="CIROC - Healer 2 (Suporte)" data-role="heal">🌿 Alt 2: Healer (Suporte)</option>
+                <option value="CIROC - Mago Alt (DPS)" data-role="dps">🔮 Alt 3: Mago (DPS)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Slot Hell -->
+          <div class="slot-box">
+            <div class="slot-header">
+              <span class="slot-player">Hell</span>
+              <span class="slot-type">Main: Healer</span>
+            </div>
+            <div class="slot-select">
+              <label>Escolher Personagem:</label>
+              <select id="select-hell" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
+                <option value="Hell - Healer (Suporte)" data-role="heal">🌿 Main: Healer (Suporte)</option>
+                <option value="Hell - Mago (DPS)" data-role="dps" selected>🔮 Alt: Mago (DPS)</option>
+                <option value="Hell - Healer Alt (Suporte)" data-role="heal">🌿 Alt: Healer (Suporte)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Slot Rafaxdwar -->
+          <div class="slot-box">
+            <div class="slot-header">
+              <span class="slot-player">Rafaxdwar</span>
+              <span class="slot-type">Main: DPS</span>
+            </div>
+            <div class="slot-select">
+              <label>Escolher Personagem:</label>
+              <select id="select-rafax" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
+                <option value="Rafaxdwar - Gladiador (DPS/Off-Tank)" data-role="dps">⚔️ Alt: Gladiador (DPS)</option>
+                <option value="Rafaxdwar - Templário (Tank)" data-role="tank" selected>🛡️ Alt: Templário (Tank)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Synergy Overview -->
+        <div class="team-synergy-card">
+          <h3>STATUS DA FORMAÇÃO ESCOLHIDA</h3>
+          <div class="synergy-meter">
+            <div class="synergy-stat">
+              <span class="stat-icon">🛡️ Tanks:</span>
+              <span class="stat-count" id="count-tank">1</span>
+            </div>
+            <div class="synergy-stat">
+              <span class="stat-icon">🌿 Healers:</span>
+              <span class="stat-count" id="count-heal">1</span>
+            </div>
+            <div class="synergy-stat">
+              <span class="stat-icon">🔮 DPS:</span>
+              <span class="stat-count" id="count-dps">2</span>
+            </div>
+          </div>
+
+          <div id="synergy-verdict" class="synergy-verdict success">
+            ✅ Formação Balanceada Perfeita! (1 Tank, 1 Healer, 2 DPS)
+          </div>
+
+          <div class="preset-buttons">
+            <button class="preset-btn" onclick="AionAgenda.loadPreset('main')">Equipe Principal (Mains)</button>
+            <button class="preset-btn" onclick="AionAgenda.loadPreset('alt1')">Comp Alts 1 (Rafax Tank + CIROC Healer)</button>
+            <button class="preset-btn" onclick="AionAgenda.loadPreset('alt2')">Comp Alts 2 (Kharnoxy Tank + Hell Healer)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CHECK-IN DIÁRIO & CONTROLE DE DGS -->
+    <section id="tab-checkin" class="tab-content">
+      <div class="section-title-bar">
+        <div>
+          <h2>CHECK-IN DIÁRIO DE PRESENÇA (SINCRONIZAÇÃO EM NUVEM)</h2>
+          <p class="section-desc">Faça login com sua senha para confirmar sua presença às 19:00 ou deixe anotações se não puder comparecer. Atualiza em tempo real para toda a PT!</p>
+        </div>
+      </div>
+
+      <!-- Logged-in User Dedicated Action Card -->
+      <div id="user-checkin-panel" class="user-action-card">
+        <div class="user-action-header">
+          <div class="user-action-title">
+            <span class="action-icon">✍️</span>
+            <div>
+              <h3 id="action-panel-greeting">Sua Confirmação de Hoje</h3>
+              <span id="action-panel-sub" class="action-sub">Faça login para registrar seu status oficial e observações</span>
+            </div>
+          </div>
+          <button id="action-panel-login-btn" class="login-action-btn" onclick="AionAgenda.openLoginModal()">Fazer Login Agora</button>
+        </div>
+
+        <div id="action-panel-body" class="user-action-body disabled">
+          <div class="status-choice-group">
+            <label class="input-label">Selecione seu status para hoje:</label>
+            <div class="status-buttons-row">
+              <button class="status-choice-btn active" data-status="ready" onclick="AionAgenda.selectPresenceStatus('ready')">
+                <span class="status-btn-icon">🟢</span>
+                <span>Vou Jogar (Confirmado)</span>
+              </button>
+              <button class="status-choice-btn" data-status="absent" onclick="AionAgenda.selectPresenceStatus('absent')">
+                <span class="status-btn-icon">🔴</span>
+                <span>Não poderei comparecer</span>
+              </button>
+              <button class="status-choice-btn" data-status="office" onclick="AionAgenda.selectPresenceStatus('office')">
+                <span class="status-btn-icon">🏢</span>
+                <span>Presencial / Escritório</span>
+              </button>
+              <button class="status-choice-btn" data-status="late" onclick="AionAgenda.selectPresenceStatus('late')">
+                <span class="status-btn-icon">⏳</span>
+                <span>Vou me atrasar</span>
+              </button>
+              <button class="status-choice-btn" data-status="raven" onclick="AionAgenda.selectPresenceStatus('raven')">
+                <span class="status-btn-icon">🦅</span>
+                <span>Raven Online (22h)</span>
+              </button>
+              <button class="status-choice-btn" data-status="family" onclick="AionAgenda.selectPresenceStatus('family')">
+                <span class="status-btn-icon">👶</span>
+                <span>Família / Outro</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="note-input-group">
+            <label class="input-label" for="my-presence-note">
+              📝 Recado / Anotação para a PT (caso não possa comparecer ou observação especial):
+            </label>
+            <textarea id="my-presence-note" placeholder="Ex: Hoje tenho que ficar até 19:30 no escritório, comecem sem mim ou rushem os alts primeiro..." rows="3"></textarea>
+          </div>
+
+          <div class="action-submit-row">
+            <button id="save-presence-btn" class="save-presence-btn" onclick="AionAgenda.submitMyPresence()">
+              💾 SALVAR STATUS & SINCRONIZAR NA NUVEM
+            </button>
+            <span id="save-status-msg" class="save-status-msg"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Realtime Live Presence Board -->
+      <div class="checkin-container">
+        <!-- Daily Presence Box -->
+        <div class="presence-box">
+          <div class="box-title-row">
+            <h3>PAINEL DE PRESENÇA EM TEMPO REAL</h3>
+            <span class="live-sync-badge">⚡ Sincronizado via Supabase</span>
+          </div>
+
+          <div class="presence-list" id="presence-live-list">
+            <!-- Dynamic Cards for each 4 members injected by JS -->
+          </div>
+        </div>
+
+        <!-- Weekly Dungeon Clear Tracker -->
+        <div class="dg-tracker-box">
+          <div class="tracker-header">
+            <h3>ROTAÇÃO DE DUNGEONS DA SEMANA</h3>
+            <button class="reset-btn" onclick="AionAgenda.resetDungeons()">🔄 Resetar Semana</button>
+          </div>
+          <p class="tracker-hint">Marque as DGs concluídas pela PT (Qua/Qui/Sex):</p>
+
+          <div class="dg-check-list" id="dg-list">
+            <!-- Items injected by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: MURAL DE AVISOS & METAS -->
+    <section id="tab-avisos" class="tab-content">
+      <div class="section-title-bar">
+        <div>
+          <h2>MURAL DE AVISOS & REGRAS DA PT</h2>
+          <p class="section-desc">Notas rápidas, divisão de drops, links úteis e avisos para os companheiros de guilda salvos em nuvem.</p>
+        </div>
+      </div>
+
+      <div class="notes-grid">
+        <!-- Regras Fixas da PT -->
+        <div class="note-card rules-card">
+          <div class="note-header">
+            <span class="note-pin">📌</span>
+            <h3>CONTRATO SAGRADO DA PT</h3>
+          </div>
+          <ul class="fixed-rules-list">
+            <li><strong>1. Respeito ao Horário das 19:00:</strong> Chegar pontual para começar a montar o grupo e entrar nas instâncias sem atraso.</li>
+            <li><strong>2. Abismo Diário às 16:00:</strong> Quem puder logar faz a 1 hora diária de abismo em grupo para garantir AP e itens.</li>
+            <li><strong>3. Quarta, Quinta e Sexta:</strong> DIAS SAGRADOS DE DUNGEONS DOS MAINS! Ninguém fura sem aviso prévio.</li>
+            <li><strong>4. Limite do Hell (22:00):</strong> As atividades principais da PT com o Hell devem ser concluídas até 22:00, pois ele tem compromisso no Raven Online.</li>
+            <li><strong>5. Finais de Semana Livres:</strong> Se Kharnoxy e CIROC saírem, Rafax e Hell estão autorizados a fazer alts ou solo sem cobrança.</li>
+          </ul>
+        </div>
+
+        <!-- Bloco de Notas Sincronizadas -->
+        <div class="note-card custom-notes-card">
+          <div class="note-header">
+            <span class="note-pin">📝</span>
+            <h3>ANOTAÇÕES & DROPS DA SEMANA</h3>
+          </div>
+
+          <div class="add-note-box">
+            <input type="text" id="note-input" placeholder="Ex: Prioridade da arma épica de DG para o CIROC..." maxlength="120">
+            <button id="add-note-btn" onclick="AionAgenda.addCustomNote()">Adicionar</button>
+          </div>
+
+          <div class="notes-list" id="custom-notes-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <div class="footer-content">
+        <p>AION 2 • Static Party Manager | Criado para <strong>Kharnoxy</strong>, <strong>CIROC</strong>, <strong>Hell</strong> & <strong>Rafaxdwar</strong></p>
+        <span class="footer-meta">DESENVOLVIDO POR - Kharnoxy</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 1: LOGIN DOS INTEGRANTES DA PT
+       =================================================================== -->
+  <div id="login-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🔑 LOGIN DO INTEGRANTE DA PT</h3>
+        <button class="modal-close" onclick="AionAgenda.closeLoginModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Selecione quem você é na PT e digite sua senha para confirmar presença e deixar recados:</p>
+
+        <div class="member-select-grid">
+          <div class="member-radio-card active" data-player="kharnoxy" onclick="AionAgenda.selectLoginPlayer('kharnoxy')">
+            <div class="m-avatar">🛡️</div>
+            <div class="m-text">
+              <strong>Kharnoxy</strong>
+              <span>Templário (Tank)</span>
+            </div>
+          </div>
+          <div class="member-radio-card" data-player="ciroc" onclick="AionAgenda.selectLoginPlayer('ciroc')">
+            <div class="m-avatar">🔮</div>
+            <div class="m-text">
+              <strong>CIROC</strong>
+              <span>Mago (DPS)</span>
+            </div>
+          </div>
+          <div class="member-radio-card" data-player="hell" onclick="AionAgenda.selectLoginPlayer('hell')">
+            <div class="m-avatar">🌿</div>
+            <div class="m-text">
+              <strong>Hell</strong>
+              <span>Healer (Suporte)</span>
+            </div>
+          </div>
+          <div class="member-radio-card" data-player="rafax" onclick="AionAgenda.selectLoginPlayer('rafax')">
+            <div class="m-avatar">⚔️</div>
+            <div class="m-text">
+              <strong>Rafaxdwar</strong>
+              <span>Guerreiro (DPS/Flex)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Senha de Acesso:</label>
+          <input type="password" id="login-password" placeholder="Digite sua senha..." autocomplete="current-password">
+          <span class="password-hint">💡 Senha padrão inicial para todos: <strong>1234</strong></span>
+        </div>
+
+        <div id="login-error-msg" class="login-error-msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="AionAgenda.closeLoginModal()">Cancelar</button>
+        <button class="btn-submit" onclick="AionAgenda.submitLogin()">Entrar na Conta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 2: STATUS DA NUVEM & BANCO AUTOMÁTICO
+       =================================================================== -->
+  <div id="config-modal" class="modal-backdrop">
+    <div class="modal-card config-modal-card">
+      <div class="modal-header">
+        <h3>⚡ NUVEM & BANCO AUTOMÁTICO DA PT</h3>
+        <button class="modal-close" onclick="AionAgenda.closeConfigModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          O sistema conta com <strong>Sincronização Automática em Nuvem</strong> integrada! Tudo o que você e seus amigos confirmarem (presenças, anotações e dungeons) é sincronizado em tempo real sem precisar de configuração manual.
+        </p>
+
+        <div class="setup-sql-callout">
+          <strong>🟢 Status dos Motores de Dados:</strong>
+          <ul style="margin-top:6px; padding-left:20px; font-size:0.85rem; line-height:1.6;">
+            <li><strong>Nuvem Descentralizada (GunDB):</strong> <span style="color:#4ef090;">Ativa e Conectada 🟢</span> (sincroniza entre navegadores pela internet sem chaves).</li>
+            <li><strong>Servidor Local (Node.js):</strong> Execute <code>INICIAR_AGENDA.bat</code> se desejar rodar o servidor em sua rede local.</li>
+            <li><strong>Supabase (Opcional):</strong> Pode ser vinculado caso queira usar sua própria instância personalizada.</li>
+          </ul>
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label for="cfg-supabase-url">Supabase URL (Opcional / Avançado):</label>
+          <input type="text" id="cfg-supabase-url" placeholder="https://seu-projeto.supabase.co">
+        </div>
+
+        <div class="form-group">
+          <label for="cfg-supabase-key">Supabase Anon Key (Opcional / Avançado):</label>
+          <input type="password" id="cfg-supabase-key" placeholder="Deixe em branco para usar a Nuvem Automática padrão">
+        </div>
+
+        <div id="cfg-status-msg" class="cfg-status-msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="AionAgenda.closeConfigModal()">Fechar</button>
+        <button class="btn-submit" onclick="AionAgenda.saveSupabaseConfig()">Salvar Ajustes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
