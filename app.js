@@ -18,6 +18,7 @@ const AionAgenda = (() => {
   const STORAGE = {
     LOGGED_USER: 'aion_logged_user',
     ALARM_ENABLED: 'aion_windows_alarm_enabled',
+    ALARM_VOLUME: 'aion_alarm_volume',
     SOUND_ENABLED: 'aion_sound_enabled',
     PRESENCE_CACHE: 'aion_presence_cache',
     DUNGEONS_CACHE: 'aion_dungeons_cache',
@@ -29,7 +30,7 @@ const AionAgenda = (() => {
     kharnoxy: { id: 'kharnoxy', name: 'Kharnoxy', class: 'Templário (Tank)', role: 'tank', avatar: '🛡️', iconImg: 'assets/classes/UT_Class_Templar_Large.webp' },
     ciroc: { id: 'ciroc', name: 'CIROC', class: 'Mago (DPS)', role: 'dps', avatar: '🔮', iconImg: 'assets/classes/UT_Class_Sorcerer_Large.webp' },
     hell: { id: 'hell', name: 'Hell', class: 'Clérigo (Suporte)', role: 'heal', avatar: '🌿', iconImg: 'assets/classes/UT_Class_Cleric_Large.webp' },
-    rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Gladiador (DPS)', role: 'dps', avatar: '⚔️', iconImg: 'assets/classes/UT_Class_Gladiator_Large.webp' },
+    rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Arqueiro (DPS Ranged)', role: 'dps', avatar: '🏹', iconImg: 'assets/classes/UT_Class_Ranger_Large.webp' },
     brokenboy: { id: 'brokenboy', name: 'Brokenboy', class: 'Encantador (Buffer)', role: 'heal', avatar: '🪄', iconImg: 'assets/classes/UT_Class_Chanter_Large.webp' }
   };
 
@@ -50,6 +51,9 @@ const AionAgenda = (() => {
   let windowsAlarmEnabled = localStorage.getItem(STORAGE.ALARM_ENABLED) !== 'false';
   let soundEnabled = localStorage.getItem(STORAGE.SOUND_ENABLED) !== 'false';
   let lastAlarmMinute = null;
+  let alarmAudioElement = null;
+  let isAlarmPlaying = false;
+  let alarmVolume = parseFloat(localStorage.getItem(STORAGE.ALARM_VOLUME) || '100') / 100;
 
   // Web Audio Context for Native Sound Generation
   let audioCtx = null;
@@ -178,7 +182,98 @@ const AionAgenda = (() => {
     }
   }
 
+  // HTML5 Continuous Audio Alarm with Volume & Loop
+  function initAlarmAudio() {
+    if (!alarmAudioElement) {
+      alarmAudioElement = new Audio('alarme.mp3');
+      alarmAudioElement.loop = true;
+      alarmAudioElement.volume = alarmVolume;
+      alarmAudioElement.preload = 'auto';
+    }
+  }
+
+  function startAlarmLoop(title, subtitle) {
+    if (!windowsAlarmEnabled) return;
+    initAlarmAudio();
+    isAlarmPlaying = true;
+    alarmAudioElement.loop = true;
+    alarmAudioElement.volume = alarmVolume;
+    alarmAudioElement.currentTime = 0;
+
+    const playPromise = alarmAudioElement.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn('Audio play error, falling back to synth beep:', err);
+        playWindowsAlarmSound();
+      });
+    }
+
+    const banner = document.getElementById('alarm-banner');
+    const titleEl = document.getElementById('alarm-banner-title');
+    const subEl = document.getElementById('alarm-banner-sub');
+    const testBtn = document.getElementById('alarm-test-btn');
+
+    if (title && titleEl) titleEl.textContent = title;
+    if (subtitle && subEl) subEl.textContent = subtitle;
+    if (banner) banner.classList.remove('hidden');
+
+    if (testBtn) {
+      testBtn.className = 'control-btn test-btn ringing';
+      testBtn.textContent = '⏹️ Parar Alarme';
+    }
+  }
+
+  function stopAlarm() {
+    isAlarmPlaying = false;
+    if (alarmAudioElement) {
+      alarmAudioElement.pause();
+      alarmAudioElement.currentTime = 0;
+    }
+
+    const banner = document.getElementById('alarm-banner');
+    if (banner) banner.classList.add('hidden');
+
+    const testBtn = document.getElementById('alarm-test-btn');
+    if (testBtn) {
+      testBtn.className = 'control-btn test-btn';
+      testBtn.textContent = '🔊 Testar Alarme';
+    }
+    playClick();
+  }
+
+  function setAlarmVolume(val) {
+    const num = Math.max(0, Math.min(100, parseInt(val, 10) || 0));
+    alarmVolume = num / 100;
+    localStorage.setItem(STORAGE.ALARM_VOLUME, num);
+
+    if (alarmAudioElement) {
+      alarmAudioElement.volume = alarmVolume;
+    }
+
+    const disp = document.getElementById('volume-val-display');
+    if (disp) disp.textContent = `${num}%`;
+
+    const icon = document.getElementById('volume-icon');
+    if (icon) {
+      if (num === 0) icon.textContent = '🔇';
+      else if (num < 50) icon.textContent = '🔉';
+      else icon.textContent = '🔊';
+    }
+  }
+
+  function initVolumeUI() {
+    const savedVol = parseInt(localStorage.getItem(STORAGE.ALARM_VOLUME) || '100', 10);
+    const slider = document.getElementById('alarm-volume-slider');
+    if (slider) slider.value = savedVol;
+    setAlarmVolume(savedVol);
+  }
+
   function testWindowsAlarm() {
+    if (isAlarmPlaying) {
+      stopAlarm();
+      return;
+    }
+
     if ('Notification' in window && Notification.permission !== 'granted') {
       Notification.requestPermission().then(() => {
         triggerTestAlarm();
@@ -189,12 +284,14 @@ const AionAgenda = (() => {
   }
 
   function triggerTestAlarm() {
-    playWindowsAlarmSound();
-    sendWindowsNotification(
-      '⚔️ AION 2 - TESTE DE ALARME DO WINDOWS!',
-      'O apito sonoro e as notificações de desktop estão 100% ativos no seu Windows!'
+    startAlarmLoop(
+      '🚨 ATENÇÃO! OLHA A SUA AGENDA!',
+      'O áudio oficial está tocando em loop contínuo até você clicar em Parar Alarme!'
     );
-    alert('🔔 Teste executado!\nO som foi reproduzido e a notificação do Windows foi enviada.\nSe a notificação não apareceu, certifique-se de permitir notificações para esta página no navegador.');
+    sendWindowsNotification(
+      '🚨 AION 2 - TESTE DE ALARME DO WINDOWS!',
+      'O alarme sonoro está tocando sem parar no Windows até você clicar em Parar!'
+    );
   }
 
   function toggleSound() {
@@ -639,7 +736,10 @@ const AionAgenda = (() => {
     // 16:00 - HORA DO ABISMO EM GRUPO
     if (hours === 16 && minutes === 0 && seconds === 0) {
       lastAlarmMinute = minuteSignature;
-      playWindowsAlarmSound();
+      startAlarmLoop(
+        '🚨 HORA DO ABISMO EM GRUPO (16:00)!',
+        'Abra o AION 2 e entre no Discord da PT para a hora diária de Abismo!'
+      );
       sendWindowsNotification(
         '🌌 HORA DO ABISMO EM GRUPO (16:00)!',
         'Abra o AION 2 e entre no Discord da PT para a hora diária de Abismo!'
@@ -659,10 +759,26 @@ const AionAgenda = (() => {
     // 19:00 - HORA OFICIAL DA PT
     if (hours === 19 && minutes === 0 && seconds === 0) {
       lastAlarmMinute = minuteSignature;
-      playWindowsAlarmSound();
+      startAlarmLoop(
+        '🚨 HORA SAGRADA DA PT (19:00)!',
+        'Kharnoxy, CIROC, Hell, Rafax e Brokenboy: O grupo oficial está reunido!'
+      );
       sendWindowsNotification(
         '⚔️ HORA SAGRADA DA PT (19:00)!',
-        'Kharnoxy, CIROC, Hell e Rafax: O grupo oficial está reunido!'
+        'Kharnoxy, CIROC, Hell, Rafax e Brokenboy: O grupo oficial está reunido!'
+      );
+    }
+
+    // 21:00 - Entrada do Brokenboy (Quarta e Quinta)
+    if ((dayIndex === 3 || dayIndex === 4) && hours === 21 && minutes === 0 && seconds === 0) {
+      lastAlarmMinute = minuteSignature;
+      startAlarmLoop(
+        '🪄 HORA DO CHANTER (21:00)!',
+        'Brokenboy online! Mantras, buffs e reforço para o grupo!'
+      );
+      sendWindowsNotification(
+        '🪄 HORA DO CHANTER (21:00)!',
+        'Brokenboy junta-se à PT com mantras e buffs de grupo!'
       );
     }
   }
@@ -1003,6 +1119,7 @@ const AionAgenda = (() => {
     initSupabase();
     loadSession();
     updateAlarmButtonUI();
+    initVolumeUI();
     updateSoundBtn();
 
     updateClock();
@@ -1038,6 +1155,8 @@ const AionAgenda = (() => {
     toggleSound,
     toggleWindowsAlarm,
     testWindowsAlarm,
+    stopAlarm,
+    setAlarmVolume,
     openLoginModal,
     closeLoginModal,
     selectLoginPlayer,

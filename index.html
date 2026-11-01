@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Agenda da PT - AION 2 | Central dos Daevas</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="alternate icon" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,6 +21,22 @@
     <div class="glow-orb orb-1"></div>
     <div class="glow-orb orb-2"></div>
     <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Alarm Ringing Banner (Toca sem parar em loop até a pessoa clicar em parar) -->
+  <div id="alarm-banner" class="alarm-banner hidden">
+    <div class="alarm-banner-content">
+      <div class="alarm-pulse-dot"></div>
+      <div class="alarm-banner-info">
+        <strong id="alarm-banner-title">🚨 ATENÇÃO! OLHA A SUA AGENDA!</strong>
+        <span id="alarm-banner-sub">Horário oficial da PT ou evento marcado. O alarme tocará sem parar até você parar!</span>
+      </div>
+      <div class="alarm-banner-actions">
+        <button class="stop-alarm-btn" onclick="AionAgenda.stopAlarm()">
+          ⏹️ PARAR ALARME
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="app-container">
@@ -49,9 +67,14 @@
           <button id="alarm-toggle-btn" class="control-btn alarm-btn active" onclick="AionAgenda.toggleWindowsAlarm()" title="Ativar/Desativar apito no Windows">
             🔔 Alarme: ON
           </button>
-          <button class="control-btn test-btn" onclick="AionAgenda.testWindowsAlarm()" title="Testar apito sonoro e notificação no Windows">
-            🔊 Testar Apito
+          <button id="alarm-test-btn" class="control-btn test-btn" onclick="AionAgenda.testWindowsAlarm()" title="Testar alarme contínuo e notificação">
+            🔊 Testar Alarme
           </button>
+          <div class="volume-control-box" title="Ajuste o volume do alarme">
+            <span id="volume-icon" class="volume-icon">🔊</span>
+            <input type="range" id="alarm-volume-slider" min="0" max="100" value="100" class="volume-slider" oninput="AionAgenda.setAlarmVolume(this.value)">
+            <span id="volume-val-display" class="volume-val">100%</span>
+          </div>
         </div>
 
         <div id="auth-box" class="auth-box">
@@ -444,15 +467,15 @@
         <!-- 4. RAFAXDWAR -->
         <div class="member-card">
           <div class="member-card-header">
-            <div class="avatar-crest gladiator-crest">
-              <img src="assets/classes/UT_Class_Gladiator_Large.webp" alt="Gladiador" class="official-class-icon">
+            <div class="avatar-crest ranger-crest">
+              <img src="assets/classes/UT_Class_Ranger_Large.webp" alt="Arqueiro" class="official-class-icon">
             </div>
             <div class="member-titles">
               <div class="tag-row">
-                <span class="badge-role glad">GLADIADOR DPS</span>
+                <span class="badge-role dps">ARQUEIRO DPS</span>
               </div>
               <h3>Rafaxdwar</h3>
-              <span class="class-label">Gladiador (DPS Melee & Área)</span>
+              <span class="class-label">Arqueiro (Ranger / DPS Ranged)</span>
             </div>
           </div>
 
@@ -588,14 +611,14 @@
           <div class="slot-box">
             <div class="slot-header">
               <span class="slot-player">Rafaxdwar</span>
-              <span class="slot-type">Main: Gladiador (DPS)</span>
+              <span class="slot-type">Main: Arqueiro (DPS Ranged)</span>
             </div>
             <div class="slot-select">
               <label>Escolher Personagem:</label>
               <select id="select-rafax" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
-                <option value="Rafaxdwar - Gladiador (DPS)" data-role="dps">⚔️ Main: Gladiador (DPS)</option>
+                <option value="Rafaxdwar - Arqueiro (DPS)" data-role="dps">🏹 Main: Arqueiro (DPS Ranged)</option>
                 <option value="Rafaxdwar - Chanter (Buffer)" data-role="chanter">🪄 Alt: Chanter (Buffer)</option>
-                <option value="Rafaxdwar - Templário (Tank)" data-role="tank" selected>🛡️ Alt: Templário (Tank)</option>
+                <option value="Rafaxdwar - Templário (Tank)" data-role="tank">🛡️ Alt: Templário (Tank)</option>
               </select>
             </div>
           </div>
@@ -874,12 +897,12 @@
 
           <!-- Rafaxdwar -->
           <div class="member-radio-card" data-player="rafax" onclick="AionAgenda.selectLoginPlayer('rafax')">
-            <div class="m-crest gladiator-crest">
-              <img src="assets/classes/UT_Class_Gladiator_Large.webp" alt="Gladiador" class="official-class-icon-modal">
+            <div class="m-crest ranger-crest">
+              <img src="assets/classes/UT_Class_Ranger_Large.webp" alt="Arqueiro" class="official-class-icon-modal">
             </div>
             <div class="m-text">
               <strong>Rafaxdwar</strong>
-              <span>Gladiador (DPS)</span>
+              <span>Arqueiro (DPS)</span>
             </div>
           </div>
 
