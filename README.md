@@ -1,12 +1,12 @@
-# ⚔️ Agenda da PT - AION 2 | Sincronizada em Nuvem com Supabase & GunDB
+# ⚔️ Agenda da PT - AION 2 | Hospedado na Vercel com Banco Supabase
 
 Aplicação web interativa criada para gerenciar os horários, rotinas, personagens principais e alts da PT de **AION 2**.
 
 ---
 
-## 🌐 Link Público da PT (Online para Todos os Amigos)
-> 🔗 **Acesse online:** [https://brunompvieira.github.io/agenda-da-pt-aion2/](https://brunompvieira.github.io/agenda-da-pt-aion2/)
-*(Compartilhe este link com CIROC, Hell e Rafaxdwar no Discord ou WhatsApp. Funciona no PC e celular!)*
+## 🚀 Links Oficiais da PT (Online na Vercel)
+> 🔗 **Acesse na Vercel:** [https://agenda-da-pt-aion2.vercel.app](https://agenda-da-pt-aion2.vercel.app)
+*(Hospedado na Vercel e conectado diretamente ao banco de dados Supabase com sincronização em tempo real).*
 
 ---
 
