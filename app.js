@@ -1,24 +1,27 @@
 /**
- * AGENDA DA PT - AION 2 | JAVASCRIPT ENGINE
- * Handles:
- * 1. Automatic Zero-Config Decentralized Cloud Sync (GunDB)
- * 2. Native Local Node.js Server Auto-Detection & SSE Stream
- * 3. Member Authentication (Kharnoxy, CIROC, Hell, Rafaxdwar)
- * 4. Windows Audio Alarm & Desktop Notifications
- * 5. Presence Tracking with Notes & Alts Simulator
+ * AGENDA DA PT - AION 2 | JAVASCRIPT ENGINE (SUPABASE NUVEM + VERCEL)
+ * 1. Conexão direta com Supabase Cloud Database (PostgreSQL + Realtime)
+ * 2. Autenticação dos 4 Guerreiros (Kharnoxy, CIROC, Hell, Rafaxdwar)
+ * 3. Confirmação de Presença e Campo de Anotações sincronizados em nuvem
+ * 4. Sistema de Alarme e Apito no Windows (Web Audio API + Desktop Notifications)
+ * 5. Simulador de Composição de Alts e Dungeons Tracker
  */
 
 const AionAgenda = (() => {
+  // Configuração Oficial do Supabase da PT
+  const SUPABASE_CONFIG = {
+    URL: 'https://kdlignxlflfhpxbpnkxo.supabase.co',
+    KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkbGlnbnhsZmxmaHB4YnBua3hvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwOTk1NTUsImV4cCI6MjA5NzY3NTU1NX0.0k8D-Xa9vytFm0uNXIB7_botsbezM3z6h-Ce2w_S2Ws'
+  };
+
   // Storage Keys
   const STORAGE = {
-    SUPABASE_URL: 'aion_supabase_url',
-    SUPABASE_KEY: 'aion_supabase_key',
     LOGGED_USER: 'aion_logged_user',
     ALARM_ENABLED: 'aion_windows_alarm_enabled',
     SOUND_ENABLED: 'aion_sound_enabled',
-    PRESENCE_LOCAL: 'aion_presence_local',
-    DUNGEONS_LOCAL: 'aion_dungeons_local',
-    NOTES_LOCAL: 'aion_notes_local',
+    PRESENCE_CACHE: 'aion_presence_cache',
+    DUNGEONS_CACHE: 'aion_dungeons_cache',
+    NOTES_CACHE: 'aion_notes_cache',
   };
 
   // Predefined Party Members
@@ -30,10 +33,7 @@ const AionAgenda = (() => {
   };
 
   // State
-  let gun = null;
-  let ptGun = null;
   let supabaseClient = null;
-  let isServerConnected = false;
   let loggedUser = null;
   let selectedLoginId = 'kharnoxy';
   let mySelectedStatus = 'ready';
@@ -203,151 +203,49 @@ const AionAgenda = (() => {
   }
 
   // ===================================================================
-  // AUTOMATIC ZERO-CONFIG CLOUD DATABASE (GunDB)
+  // SUPABASE CLOUD INITIALIZATION & REALTIME
   // ===================================================================
-  function initGunCloud() {
-    if (!window.Gun) {
-      console.warn('GunDB script não disponível');
+  function initSupabase() {
+    if (!window.supabase) {
+      console.warn('SDK do Supabase não carregado.');
+      updateDbStatusUI('Supabase: Carregando...', false);
       return;
     }
 
     try {
-      gun = window.Gun({
-        peers: [
-          'https://gun-manhattan.herokuapp.com/gun',
-          'https://peer.wallie.io/gun'
-        ]
-      });
+      supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY);
+      updateDbStatusUI('Supabase: Conectado 🟢', true);
+      console.log('Conectado ao Supabase com sucesso!');
 
-      ptGun = gun.get('aion2_pt_agenda_kharnoxy_party_2026');
-      console.log('GunDB Nuvem Automática inicializada com sucesso!');
-
-      const today = getTodayString();
-
-      // Listen for realtime presence changes
-      ptGun.get('presence').get(today).map().on((data, playerId) => {
-        if (data && playerId && MEMBERS[playerId]) {
-          let localData = {};
-          try {
-            localData = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_LOCAL)) || {};
-          } catch(e) {}
-          if (!localData[today]) localData[today] = {};
-
-          localData[today][playerId] = {
-            status: data.status || 'ready',
-            note: data.note || '',
-            updated_at: data.updated_at || new Date().toISOString()
-          };
-          localStorage.setItem(STORAGE.PRESENCE_LOCAL, JSON.stringify(localData));
-          renderPresenceList(localData[today]);
-        }
-      });
-
-      // Listen for realtime dungeons progress
-      ptGun.get('dungeons').on((data) => {
-        if (data) {
-          const clean = {};
-          defaultDungeons.forEach(d => {
-            if (data[d.id]) clean[d.id] = true;
-          });
-          localStorage.setItem(STORAGE.DUNGEONS_LOCAL, JSON.stringify(clean));
-          renderDungeons();
-        }
-      });
-
-      // Listen for announcements
-      ptGun.get('announcements').on((data) => {
-        if (data && data.list) {
-          try {
-            const list = JSON.parse(data.list);
-            if (Array.isArray(list) && list.length > 0) {
-              localStorage.setItem(STORAGE.NOTES_LOCAL, JSON.stringify(list));
-              renderNotes(list);
-            }
-          } catch(e) {}
-        }
-      });
-
-      updateCloudStatusUI('Nuvem: Conectada 🟢', true);
-    } catch (err) {
-      console.warn('Erro ao conectar GunDB:', err);
+      // Realtime listener para Presença e Avisos
+      subscribeRealtime();
+    } catch (e) {
+      console.error('Erro ao conectar ao Supabase:', e);
+      updateDbStatusUI('Supabase: Erro de Conexão 🔴', false);
     }
   }
 
-  // ===================================================================
-  // LOCAL NODE.JS SERVER AUTO-DETECTION & SSE REALTIME
-  // ===================================================================
-  async function checkLocalServer() {
+  function subscribeRealtime() {
+    if (!supabaseClient) return;
+
     try {
-      const res = await fetch('/api/data');
-      if (res.ok) {
-        const data = await res.json();
-        isServerConnected = true;
-        updateCloudStatusUI('Servidor Local: Conectado 🟢', true);
-
-        // Populate from server
-        if (data.presence) {
-          const today = getTodayString();
-          if (data.presence[today]) {
-            let local = {};
-            try { local = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_LOCAL)) || {}; } catch(e) {}
-            local[today] = { ...local[today], ...data.presence[today] };
-            localStorage.setItem(STORAGE.PRESENCE_LOCAL, JSON.stringify(local));
-            renderPresenceList(local[today]);
-          }
-        }
-
-        if (data.dungeons) {
-          localStorage.setItem(STORAGE.DUNGEONS_LOCAL, JSON.stringify(data.dungeons));
-          renderDungeons();
-        }
-
-        if (data.announcements) {
-          localStorage.setItem(STORAGE.NOTES_LOCAL, JSON.stringify(data.announcements));
-          renderNotes(data.announcements);
-        }
-
-        // Connect SSE stream
-        initServerEvents();
-      }
-    } catch(e) {
-      // Local server not running or static file mode
-      isServerConnected = false;
-    }
-  }
-
-  function initServerEvents() {
-    try {
-      const evtSource = new EventSource('/api/stream');
-      evtSource.addEventListener('presence_update', (e) => {
-        const payload = JSON.parse(e.data);
-        const today = getTodayString();
-        if (payload.date === today) {
-          let local = {};
-          try { local = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_LOCAL)) || {}; } catch(err) {}
-          if (!local[today]) local[today] = {};
-          local[today][payload.player_id] = payload.data;
-          localStorage.setItem(STORAGE.PRESENCE_LOCAL, JSON.stringify(local));
-          renderPresenceList(local[today]);
+      supabaseClient
+        .channel('pt-realtime-channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_presence' }, (payload) => {
+          console.log('⚡ Atualização em tempo real recebida do Supabase:', payload);
+          loadPresenceData();
           playBeep(659, 'sine', 0.1, 0.05);
-        }
-      });
-
-      evtSource.addEventListener('dungeons_update', (e) => {
-        const dungeons = JSON.parse(e.data);
-        localStorage.setItem(STORAGE.DUNGEONS_LOCAL, JSON.stringify(dungeons));
-        renderDungeons();
-      });
-
-      evtSource.addEventListener('announcements_update', (e) => {
-        const notes = JSON.parse(e.data);
-        localStorage.setItem(STORAGE.NOTES_LOCAL, JSON.stringify(notes));
-        renderNotes(notes);
-      });
-    } catch(e) {}
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_announcements' }, () => {
+          loadNotesData();
+        })
+        .subscribe();
+    } catch (e) {
+      console.warn('Realtime subscription error:', e);
+    }
   }
 
-  function updateCloudStatusUI(label, connected) {
+  function updateDbStatusUI(label, connected) {
     const dot = document.getElementById('db-status-dot');
     const lbl = document.getElementById('db-status-label');
     if (dot) dot.className = connected ? 'status-indicator connected' : 'status-indicator fallback';
@@ -365,23 +263,8 @@ const AionAgenda = (() => {
     if (modal) modal.classList.remove('open');
   }
 
-  function saveSupabaseConfig() {
-    const url = (document.getElementById('cfg-supabase-url')?.value || '').trim();
-    const key = (document.getElementById('cfg-supabase-key')?.value || '').trim();
-    if (url && key) {
-      localStorage.setItem(STORAGE.SUPABASE_URL, url);
-      localStorage.setItem(STORAGE.SUPABASE_KEY, key);
-      try {
-        supabaseClient = window.supabase.createClient(url, key);
-        updateCloudStatusUI('Supabase: Conectado 🟢', true);
-      } catch(e) {}
-    }
-    closeConfigModal();
-    playSuccessChime();
-  }
-
   // ===================================================================
-  // AUTHENTICATION (MEMBERS LOGIN)
+  // AUTHENTICATION (MEMBERS LOGIN VIA SUPABASE)
   // ===================================================================
   function loadSession() {
     try {
@@ -414,7 +297,7 @@ const AionAgenda = (() => {
       }
 
       if (actionGreeting) actionGreeting.textContent = `Olá, ${loggedUser.name}! Confirme seu status de hoje:`;
-      if (actionSub) actionSub.textContent = `Classe: ${loggedUser.class} • Suas alterações são sincronizadas para toda a PT`;
+      if (actionSub) actionSub.textContent = `Classe: ${loggedUser.class} • Salvo no Supabase e visível para toda a PT`;
       if (actionLoginBtn) actionLoginBtn.style.display = 'none';
       if (actionBody) actionBody.classList.remove('disabled');
 
@@ -468,9 +351,41 @@ const AionAgenda = (() => {
       return;
     }
 
-    // Default password is 1234
-    const memberData = MEMBERS[selectedLoginId];
-    if (password === '1234' || password === 'admin' || password === 'aion') {
+    if (errEl) errEl.textContent = 'Verificando senha no Supabase...';
+
+    let authSuccess = false;
+    let memberData = MEMBERS[selectedLoginId];
+
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('members_auth')
+          .select('*')
+          .eq('id', selectedLoginId)
+          .single();
+
+        if (!error && data) {
+          if (data.password === password) {
+            authSuccess = true;
+            memberData = {
+              id: data.id,
+              name: data.display_name,
+              class: data.class_name,
+              avatar: data.avatar || '🛡️'
+            };
+          }
+        }
+      } catch (e) {
+        console.warn('Erro ao consultar Supabase auth:', e);
+      }
+    }
+
+    // Fallback if password is 1234
+    if (!authSuccess && password === '1234') {
+      authSuccess = true;
+    }
+
+    if (authSuccess) {
       loggedUser = memberData;
       localStorage.setItem(STORAGE.LOGGED_USER, JSON.stringify(loggedUser));
       updateAuthUI();
@@ -489,7 +404,7 @@ const AionAgenda = (() => {
   }
 
   // ===================================================================
-  // CHECK-IN WITH STATUS & NOTE
+  // CHECK-IN WITH STATUS & NOTE (SUPABASE DIRECT)
   // ===================================================================
   function selectPresenceStatus(status) {
     mySelectedStatus = status;
@@ -516,75 +431,61 @@ const AionAgenda = (() => {
     const statusMsg = document.getElementById('save-status-msg');
     const nowIso = new Date().toISOString();
 
-    // 1. Save Locally
-    let localData = {};
-    try { localData = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_LOCAL)) || {}; } catch (e) {}
-    if (!localData[today]) localData[today] = {};
-    localData[today][loggedUser.id] = {
+    if (statusMsg) statusMsg.textContent = 'Salvando no Supabase...';
+
+    // 1. Salvar no cache local
+    let cache = {};
+    try { cache = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_CACHE)) || {}; } catch (e) {}
+    if (!cache[today]) cache[today] = {};
+    cache[today][loggedUser.id] = {
       status: mySelectedStatus,
       note: noteText,
       updated_at: nowIso
     };
-    localStorage.setItem(STORAGE.PRESENCE_LOCAL, JSON.stringify(localData));
+    localStorage.setItem(STORAGE.PRESENCE_CACHE, JSON.stringify(cache));
 
-    // 2. Sync via GunDB (Decentralized Realtime Cloud)
-    if (ptGun) {
-      try {
-        ptGun.get('presence').get(today).get(loggedUser.id).put({
-          status: mySelectedStatus,
-          note: noteText,
-          updated_at: nowIso
-        });
-      } catch (err) {
-        console.warn('GunDB put error:', err);
-      }
-    }
-
-    // 3. Sync via Local Node Server (if running)
-    if (isServerConnected) {
-      try {
-        fetch('/api/presence', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            date: today,
-            player_id: loggedUser.id,
-            status: mySelectedStatus,
-            note: noteText
-          })
-        });
-      } catch (e) {}
-    }
-
-    // 4. Supabase fallback (if configured)
+    // 2. Salvar no Supabase (PostgreSQL)
     if (supabaseClient) {
       try {
-        supabaseClient.from('daily_presence').upsert({
-          player_id: loggedUser.id,
-          date: today,
-          status: mySelectedStatus,
-          note: noteText,
-          updated_at: nowIso
-        }, { onConflict: 'player_id, date' });
-      } catch(e) {}
+        const { error } = await supabaseClient
+          .from('daily_presence')
+          .upsert({
+            player_id: loggedUser.id,
+            date: today,
+            status: mySelectedStatus,
+            note: noteText,
+            updated_at: nowIso
+          }, { onConflict: 'player_id, date' });
+
+        if (error) {
+          console.error('Erro Supabase upsert:', error);
+          if (statusMsg) statusMsg.textContent = '⚠️ Salvo localmente (erro Supabase).';
+        } else {
+          if (statusMsg) statusMsg.textContent = '✅ Salvo e sincronizado no Supabase!';
+        }
+      } catch (err) {
+        console.error('Falha de rede Supabase:', err);
+        if (statusMsg) statusMsg.textContent = '⚠️ Salvo localmente.';
+      }
+    } else {
+      if (statusMsg) statusMsg.textContent = '✅ Salvo localmente!';
     }
 
-    renderPresenceList(localData[today]);
+    renderPresenceList(cache[today]);
     playSuccessChime();
 
-    if (statusMsg) {
-      statusMsg.textContent = '✅ Salvo e sincronizado em tempo real!';
-      setTimeout(() => { statusMsg.textContent = ''; }, 4000);
-    }
+    setTimeout(() => {
+      if (statusMsg) statusMsg.textContent = '';
+    }, 4000);
   }
 
   function loadMyCurrentPresence() {
     if (!loggedUser) return;
     const today = getTodayString();
-    let localData = {};
-    try { localData = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_LOCAL)) || {}; } catch(e) {}
+    let cache = {};
+    try { cache = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_CACHE)) || {}; } catch(e) {}
 
-    const myData = localData[today]?.[loggedUser.id];
+    const myData = cache[today]?.[loggedUser.id];
     if (myData) {
       selectPresenceStatus(myData.status || 'ready');
       const noteInput = document.getElementById('my-presence-note');
@@ -594,13 +495,44 @@ const AionAgenda = (() => {
     }
   }
 
-  function loadPresenceData() {
+  async function loadPresenceData() {
     const today = getTodayString();
     let presenceMap = {};
+
+    // 1. Ler do cache local para resposta instantânea
     try {
-      const local = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_LOCAL)) || {};
-      presenceMap = local[today] || {};
+      const cache = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_CACHE)) || {};
+      presenceMap = cache[today] || {};
     } catch (e) {}
+
+    // 2. Buscar dados atualizados do Supabase
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('daily_presence')
+          .select('*')
+          .eq('date', today);
+
+        if (!error && data) {
+          data.forEach(row => {
+            presenceMap[row.player_id] = {
+              status: row.status,
+              note: row.note || '',
+              updated_at: row.updated_at
+            };
+          });
+
+          // Atualiza cache
+          let cache = {};
+          try { cache = JSON.parse(localStorage.getItem(STORAGE.PRESENCE_CACHE)) || {}; } catch(e) {}
+          cache[today] = presenceMap;
+          localStorage.setItem(STORAGE.PRESENCE_CACHE, JSON.stringify(cache));
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar presença do Supabase:', e);
+      }
+    }
+
     renderPresenceList(presenceMap);
   }
 
@@ -910,7 +842,7 @@ const AionAgenda = (() => {
     if (!listEl) return;
 
     let progress = {};
-    try { progress = JSON.parse(localStorage.getItem(STORAGE.DUNGEONS_LOCAL)) || {}; } catch(e) {}
+    try { progress = JSON.parse(localStorage.getItem(STORAGE.DUNGEONS_CACHE)) || {}; } catch(e) {}
 
     listEl.innerHTML = '';
     defaultDungeons.forEach(dg => {
@@ -934,26 +866,9 @@ const AionAgenda = (() => {
 
   function toggleDungeon(dgId) {
     let progress = {};
-    try { progress = JSON.parse(localStorage.getItem(STORAGE.DUNGEONS_LOCAL)) || {}; } catch(e) {}
+    try { progress = JSON.parse(localStorage.getItem(STORAGE.DUNGEONS_CACHE)) || {}; } catch(e) {}
     progress[dgId] = !progress[dgId];
-    localStorage.setItem(STORAGE.DUNGEONS_LOCAL, JSON.stringify(progress));
-
-    // Sync via GunDB
-    if (ptGun) {
-      try { ptGun.get('dungeons').put(progress); } catch(e) {}
-    }
-
-    // Sync via local server
-    if (isServerConnected) {
-      try {
-        fetch('/api/dungeons', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dungeons: progress })
-        });
-      } catch(e) {}
-    }
-
+    localStorage.setItem(STORAGE.DUNGEONS_CACHE, JSON.stringify(progress));
     renderDungeons();
     if (progress[dgId]) playSuccessChime();
     else playClick();
@@ -961,26 +876,14 @@ const AionAgenda = (() => {
 
   function resetDungeons() {
     if (confirm('Deseja resetar o progresso de dungeons desta semana?')) {
-      localStorage.removeItem(STORAGE.DUNGEONS_LOCAL);
-      if (ptGun) {
-        try { ptGun.get('dungeons').put({}); } catch(e) {}
-      }
-      if (isServerConnected) {
-        try {
-          fetch('/api/dungeons', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dungeons: {} })
-          });
-        } catch(e) {}
-      }
+      localStorage.removeItem(STORAGE.DUNGEONS_CACHE);
       renderDungeons();
       playClick();
     }
   }
 
   // ===================================================================
-  // CUSTOM NOTES & ANNOUNCEMENTS
+  // CUSTOM NOTES & ANNOUNCEMENTS (SUPABASE)
   // ===================================================================
   const defaultNotes = [
     '⚔️ Quarta-feira focar em terminar as chaves da DG 1 antes das 22h (Horário do Hell).',
@@ -989,14 +892,30 @@ const AionAgenda = (() => {
     '🌿 Segundas e Terças: Rotação de alts às 19h pontual!'
   ];
 
-  function loadNotesData() {
+  async function loadNotesData() {
     let notes = [];
-    try {
-      const stored = localStorage.getItem(STORAGE.NOTES_LOCAL);
-      notes = stored ? JSON.parse(stored) : defaultNotes;
-    } catch (e) {
-      notes = defaultNotes;
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('pt_announcements')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          notes = data.map(item => item.content);
+        }
+      } catch (err) {}
     }
+
+    if (notes.length === 0) {
+      try {
+        const stored = localStorage.getItem(STORAGE.NOTES_CACHE);
+        notes = stored ? JSON.parse(stored) : defaultNotes;
+      } catch (e) {
+        notes = defaultNotes;
+      }
+    }
+
     renderNotes(notes);
   }
 
@@ -1020,64 +939,45 @@ const AionAgenda = (() => {
     const input = document.getElementById('note-input');
     if (!input || !input.value.trim()) return;
     const content = input.value.trim();
+    const author = loggedUser ? loggedUser.name : 'Kharnoxy';
 
+    // Salvar no Supabase
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('pt_announcements').insert({
+          author: author,
+          content: content
+        });
+      } catch (e) {}
+    }
+
+    // Cache local
     let notes = [];
     try {
-      const stored = localStorage.getItem(STORAGE.NOTES_LOCAL);
+      const stored = localStorage.getItem(STORAGE.NOTES_CACHE);
       notes = stored ? JSON.parse(stored) : [...defaultNotes];
     } catch(e) {
       notes = [...defaultNotes];
     }
     notes.unshift(content);
-    localStorage.setItem(STORAGE.NOTES_LOCAL, JSON.stringify(notes));
-
-    // GunDB sync
-    if (ptGun) {
-      try {
-        ptGun.get('announcements').put({ list: JSON.stringify(notes) });
-      } catch(e) {}
-    }
-
-    // Local server sync
-    if (isServerConnected) {
-      try {
-        fetch('/api/announcements', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content })
-        });
-      } catch(e) {}
-    }
+    localStorage.setItem(STORAGE.NOTES_CACHE, JSON.stringify(notes));
 
     input.value = '';
-    renderNotes(notes);
+    loadNotesData();
     playSuccessChime();
   }
 
-  function deleteNote(index) {
+  async function deleteNote(index) {
     let notes = [];
     try {
-      const stored = localStorage.getItem(STORAGE.NOTES_LOCAL);
+      const stored = localStorage.getItem(STORAGE.NOTES_CACHE);
       notes = stored ? JSON.parse(stored) : [...defaultNotes];
     } catch(e) {
       notes = [...defaultNotes];
     }
 
     notes.splice(index, 1);
-    localStorage.setItem(STORAGE.NOTES_LOCAL, JSON.stringify(notes));
-
-    if (ptGun) {
-      try {
-        ptGun.get('announcements').put({ list: JSON.stringify(notes) });
-      } catch(e) {}
-    }
-
-    if (isServerConnected) {
-      try {
-        fetch(`/api/announcements/${index}`, { method: 'DELETE' });
-      } catch(e) {}
-    }
-
+    localStorage.setItem(STORAGE.NOTES_CACHE, JSON.stringify(notes));
     renderNotes(notes);
     playClick();
   }
@@ -1087,8 +987,7 @@ const AionAgenda = (() => {
   // ===================================================================
   function init() {
     initTabs();
-    initGunCloud();
-    checkLocalServer();
+    initSupabase();
     loadSession();
     updateAlarmButtonUI();
     updateSoundBtn();
@@ -1128,7 +1027,6 @@ const AionAgenda = (() => {
     testWindowsAlarm,
     openSyncInfoModal,
     closeConfigModal,
-    saveSupabaseConfig,
     openLoginModal,
     closeLoginModal,
     selectLoginPlayer,
