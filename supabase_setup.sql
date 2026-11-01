@@ -14,15 +14,17 @@ create table if not exists members_auth (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- Inserir os 4 guerreiros com senha padrão inicial '1234' (pode ser alterada)
+-- Inserir os 4 guerreiros com as senhas oficiais cadastradas
 insert into members_auth (id, display_name, class_name, password, avatar) values
-  ('kharnoxy', 'Kharnoxy', 'Templário (Tank)', '1234', '🛡️'),
-  ('ciroc', 'CIROC', 'Mago (DPS)', '1234', '🔮'),
-  ('hell', 'Hell', 'Healer (Suporte)', '1234', '🌿'),
-  ('rafax', 'Rafaxdwar', 'Guerreiro (DPS/Flex)', '1234', '⚔️')
+  ('kharnoxy', 'Kharnoxy', 'Templário (Tank)', '157arroiz', '🛡️'),
+  ('ciroc', 'CIROC', 'Mago (DPS)', 'xandom', '🔮'),
+  ('hell', 'Hell', 'Healer (Suporte)', 'hellgay', '🌿'),
+  ('rafax', 'Rafaxdwar', 'Guerreiro (DPS/Flex)', 'pintodebolivia', '⚔️'),
+  ('rafaxdwar', 'Rafaxdwar', 'Guerreiro (DPS/Flex)', 'pintodebolivia', '⚔️')
 on conflict (id) do update set
   display_name = excluded.display_name,
-  class_name = excluded.class_name;
+  class_name = excluded.class_name,
+  password = excluded.password;
 
 -- 2. Tabela de Confirmação Diária & Anotações de Ausência
 create table if not exists daily_presence (

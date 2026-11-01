@@ -19,12 +19,12 @@ Aplicação web interativa criada para gerenciar os horários, rotinas, personag
 
 O sistema conta com autenticação individual para os 4 integrantes. Ao fazer login, cada um pode confirmar sua presença ou registrar justificativas/anotações que aparecem em tempo real para os outros membros no Windows.
 
-| Jogador | Classe Main | Vida Real / Rotina | Alts Disponíveis | Senha Padrão |
+| Jogador | Classe Main | Vida Real / Rotina | Alts Disponíveis | Senha Oficial |
 | :--- | :--- | :--- | :--- | :--- |
-| **Kharnoxy** | **Templário** 🛡️ (Tank) | Programador Home Office. Disponível às 19h (às vezes presencial). FDS flexível. | 🔮 1 Mago / 🌿 1 Healer | `1234` |
-| **CIROC** | **Mago** 🔮 (DPS) | Chega às 15:00 do trabalho presencial. Tarde/Noite livre. FDS flexível. | 🌿 2 Healers / 🔮 1 Mago | `1234` |
-| **Hell** | **Healer** 🌿 (Suporte) | Aposentado. Livre o dia todo, **exceto das 22:00 às 00:00** (Raven Online). | 🌿 1 Healer / 🔮 1 Mago | `1234` |
-| **Rafaxdwar** | **Guerreiro** ⚔️ (DPS/Flex) | Streamer e pai de família. **19:00** é o horário sagrado de jogo. FDS livre. | 🛡️ 1 Templário / ⚔️ 1 Gladiador | `1234` |
+| **Kharnoxy** | **Templário** 🛡️ (Tank) | Programador Home Office. Disponível às 19h (às vezes presencial). FDS flexível. | 🔮 1 Mago / 🌿 1 Healer | `157arroiz` |
+| **CIROC** | **Mago** 🔮 (DPS) | Chega às 15:00 do trabalho presencial. Tarde/Noite livre. FDS flexível. | 🌿 2 Healers / 🔮 1 Mago | `xandom` |
+| **Hell** | **Healer** 🌿 (Suporte) | Aposentado. Livre o dia todo, **exceto das 22:00 às 00:00** (Raven Online). | 🌿 1 Healer / 🔮 1 Mago | `hellgay` |
+| **Rafaxdwar** | **Guerreiro** ⚔️ (DPS/Flex) | Streamer e pai de família. **19:00** é o horário sagrado de jogo. FDS livre. | 🛡️ 1 Templário / ⚔️ 1 Gladiador | `pintodebolivia` |
 
 *(As senhas podem ser facilmente modificadas na tabela `members_auth` no Supabase ou via modal).*
 

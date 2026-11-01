@@ -24,12 +24,20 @@ const AionAgenda = (() => {
     NOTES_CACHE: 'aion_notes_cache',
   };
 
-  // Predefined Party Members
+  // Predefined Party Members & Credenciais Oficiais
   const MEMBERS = {
     kharnoxy: { id: 'kharnoxy', name: 'Kharnoxy', class: 'Templário (Tank)', role: 'tank', avatar: '🛡️' },
     ciroc: { id: 'ciroc', name: 'CIROC', class: 'Mago (DPS)', role: 'dps', avatar: '🔮' },
     hell: { id: 'hell', name: 'Hell', class: 'Healer (Suporte)', role: 'heal', avatar: '🌿' },
     rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Guerreiro (DPS/Flex)', role: 'dps', avatar: '⚔️' }
+  };
+
+  const DEFAULT_CREDENTIALS = {
+    kharnoxy: '157arroiz',
+    ciroc: 'xandom',
+    hell: 'hellgay',
+    rafax: 'pintodebolivia',
+    rafaxdwar: 'pintodebolivia'
   };
 
   // State
@@ -380,8 +388,8 @@ const AionAgenda = (() => {
       }
     }
 
-    // Fallback if password is 1234
-    if (!authSuccess && password === '1234') {
+    // Fallback if password matches official credential
+    if (!authSuccess && DEFAULT_CREDENTIALS[selectedLoginId] && password === DEFAULT_CREDENTIALS[selectedLoginId]) {
       authSuccess = true;
     }
 
@@ -392,7 +400,7 @@ const AionAgenda = (() => {
       closeLoginModal();
       playSuccessChime();
     } else {
-      if (errEl) errEl.textContent = 'Senha incorreta. (Padrão: 1234)';
+      if (errEl) errEl.textContent = 'Senha incorreta para este usuário.';
     }
   }
 
