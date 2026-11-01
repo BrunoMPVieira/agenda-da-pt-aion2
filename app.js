@@ -29,7 +29,8 @@ const AionAgenda = (() => {
     kharnoxy: { id: 'kharnoxy', name: 'Kharnoxy', class: 'Templário (Tank)', role: 'tank', avatar: '🛡️' },
     ciroc: { id: 'ciroc', name: 'CIROC', class: 'Mago (DPS)', role: 'dps', avatar: '🔮' },
     hell: { id: 'hell', name: 'Hell', class: 'Healer (Suporte)', role: 'heal', avatar: '🌿' },
-    rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Guerreiro (DPS/Flex)', role: 'dps', avatar: '⚔️' }
+    rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Guerreiro (DPS/Flex)', role: 'dps', avatar: '⚔️' },
+    brokenboy: { id: 'brokenboy', name: 'Brokenboy', class: 'Chanter (Suporte/Buffer)', role: 'heal', avatar: '🪄' }
   };
 
   const DEFAULT_CREDENTIALS = {
@@ -37,7 +38,8 @@ const AionAgenda = (() => {
     ciroc: 'xandom',
     hell: 'hellgay',
     rafax: 'pintodebolivia',
-    rafaxdwar: 'pintodebolivia'
+    rafaxdwar: 'pintodebolivia',
+    brokenboy: 'brokenbboy99'
   };
 
   // State
@@ -537,7 +539,7 @@ const AionAgenda = (() => {
     if (!container) return;
 
     container.innerHTML = '';
-    const memberKeys = ['kharnoxy', 'ciroc', 'hell', 'rafax'];
+    const memberKeys = ['kharnoxy', 'ciroc', 'hell', 'rafax', 'brokenboy'];
 
     memberKeys.forEach(id => {
       const info = MEMBERS[id];
@@ -741,6 +743,7 @@ const AionAgenda = (() => {
     const selCiroc = document.getElementById('select-ciroc');
     const selHell = document.getElementById('select-hell');
     const selRafax = document.getElementById('select-rafax');
+    const selBroken = document.getElementById('select-brokenboy');
 
     if (!selKharnoxy || !selCiroc || !selHell || !selRafax) return;
 
@@ -751,38 +754,42 @@ const AionAgenda = (() => {
       selRafax.options[selRafax.selectedIndex].getAttribute('data-role'),
     ];
 
-    let tanks = 0, heals = 0, dps = 0;
+    if (selBroken) {
+      selections.push(selBroken.options[selBroken.selectedIndex].getAttribute('data-role'));
+    }
+
+    let tanks = 0, heals = 0, chanters = 0, dps = 0;
     selections.forEach(role => {
       if (role === 'tank') tanks++;
       else if (role === 'heal') heals++;
+      else if (role === 'chanter') chanters++;
       else if (role === 'dps') dps++;
     });
 
     const countTankEl = document.getElementById('count-tank');
     const countHealEl = document.getElementById('count-heal');
+    const countChanterEl = document.getElementById('count-chanter');
     const countDpsEl = document.getElementById('count-dps');
     const verdictEl = document.getElementById('synergy-verdict');
 
     if (countTankEl) countTankEl.textContent = tanks;
     if (countHealEl) countHealEl.textContent = heals;
+    if (countChanterEl) countChanterEl.textContent = chanters;
     if (countDpsEl) countDpsEl.textContent = dps;
 
     if (verdictEl) {
-      if (tanks === 1 && heals === 1 && dps === 2) {
+      if (tanks >= 1 && (heals >= 1 || chanters >= 1) && dps >= 1) {
         verdictEl.className = 'synergy-verdict success';
-        verdictEl.innerHTML = '✨ <strong>Formação Clássica Perfeita:</strong> 1 Tank, 1 Healer e 2 DPS! Grupo 100% pronto para rushar.';
-      } else if (tanks >= 1 && heals >= 1) {
-        verdictEl.className = 'synergy-verdict success';
-        verdictEl.innerHTML = `🛡️ <strong>Formação Viável:</strong> ${tanks} Tank, ${heals} Healer e ${dps} DPS. Tem sustentação e agro garantido.`;
+        verdictEl.innerHTML = `✨ <strong>Formação Completa Forte:</strong> ${tanks} Tank, ${heals} Healer, ${chanters} Chanter (Buffs) e ${dps} DPS!`;
       } else if (tanks === 0) {
         verdictEl.className = 'synergy-verdict warning';
-        verdictEl.innerHTML = '⚠️ <strong>Atenção:</strong> Nenhum Tank selecionado! O grupo pode ter problemas para segurar agro em bosses.';
-      } else if (heals === 0) {
+        verdictEl.innerHTML = '⚠️ <strong>Atenção:</strong> Nenhum Tank selecionado!';
+      } else if (heals === 0 && chanters === 0) {
         verdictEl.className = 'synergy-verdict warning';
-        verdictEl.innerHTML = '⚠️ <strong>Perigo:</strong> Nenhum Healer selecionado! Risco alto de wipe.';
+        verdictEl.innerHTML = '⚠️ <strong>Perigo:</strong> Nenhum Healer ou Chanter selecionado!';
       } else {
-        verdictEl.className = 'synergy-verdict warning';
-        verdictEl.innerHTML = `⚠️ Formação com ${tanks} Tanks, ${heals} Healers e ${dps} DPS. Ajuste os papéis.`;
+        verdictEl.className = 'synergy-verdict success';
+        verdictEl.innerHTML = `🛡️ Grupo pronto com ${tanks} Tank, ${heals} Healer e ${dps} DPS.`;
       }
     }
   }
@@ -792,22 +799,26 @@ const AionAgenda = (() => {
     const selCiroc = document.getElementById('select-ciroc');
     const selHell = document.getElementById('select-hell');
     const selRafax = document.getElementById('select-rafax');
+    const selBroken = document.getElementById('select-brokenboy');
 
     if (presetKey === 'main') {
       selKharnoxy.selectedIndex = 0;
       selCiroc.selectedIndex = 0;
       selHell.selectedIndex = 0;
       selRafax.selectedIndex = 0;
+      if (selBroken) selBroken.selectedIndex = 0;
     } else if (presetKey === 'alt1') {
       selKharnoxy.selectedIndex = 1;
       selCiroc.selectedIndex = 1;
       selHell.selectedIndex = 1;
       selRafax.selectedIndex = 1;
+      if (selBroken) selBroken.selectedIndex = 0;
     } else if (presetKey === 'alt2') {
       selKharnoxy.selectedIndex = 0;
       selCiroc.selectedIndex = 3;
       selHell.selectedIndex = 2;
       selRafax.selectedIndex = 0;
+      if (selBroken) selBroken.selectedIndex = 1;
     }
     updateTeamBuild();
     playSuccessChime();

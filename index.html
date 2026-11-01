@@ -176,9 +176,16 @@
                 <span>Rotação de Mains: Kharnoxy, Hell, CIROC & Rafax</span>
               </div>
             </div>
+            <div class="event-item chanter-event" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="event-time" style="color: #c084fc;">21:00</span>
+              <div class="event-info">
+                <strong style="color: #e9d5ff;">Brokenboy Entra na PT 🪄</strong>
+                <span>Reforço com Mantras & Buffs de Chanter</span>
+              </div>
+            </div>
           </div>
           <div class="day-footer prime">
-            <span class="presence-hint">Presença Obrigatória (Mains)</span>
+            <span class="presence-hint">Presença Obrigatória (Mains + Chanter às 21h)</span>
           </div>
         </div>
 
@@ -204,9 +211,16 @@
                 <span>Farm de drops raros & progressão end-game</span>
               </div>
             </div>
+            <div class="event-item chanter-event" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.35);">
+              <span class="event-time" style="color: #c084fc;">21:00</span>
+              <div class="event-info">
+                <strong style="color: #e9d5ff;">Brokenboy Entra na PT 🪄</strong>
+                <span>Reforço com Mantras & Buffs de Chanter</span>
+              </div>
+            </div>
           </div>
           <div class="day-footer prime">
-            <span class="presence-hint">Presença Obrigatória (Mains)</span>
+            <span class="presence-hint">Presença Obrigatória (Mains + Chanter às 21h)</span>
           </div>
         </div>
 
@@ -448,6 +462,42 @@
             </div>
           </div>
         </div>
+
+        <!-- BROKENBOY -->
+        <div class="member-card">
+          <div class="member-card-header">
+            <div class="avatar-ring heal-ring" style="border-color: #a855f7; box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);">🪄</div>
+            <div class="member-titles">
+              <div class="tag-row">
+                <span class="badge-role" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7;">CHANTER / BUFFER</span>
+              </div>
+              <h3>Brokenboy</h3>
+              <span class="class-label">Chanter (Buffs, Mantras & Suporte)</span>
+            </div>
+          </div>
+
+          <div class="member-info-section">
+            <div class="info-row">
+              <span class="info-label">💼 Horário Geral:</span>
+              <span class="info-val">12:00 às 22:00 (Meio-dia às 10 da noite)</span>
+            </div>
+            <div class="info-row warning-row">
+              <span class="info-label">🌙 Quarta & Quinta:</span>
+              <span class="info-val"><strong>21:00 (9h da noite)</strong> joga com a PT!</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">📅 Finais de Semana:</span>
+              <span class="info-val">Disponível a partir das <strong>14:00</strong></span>
+            </div>
+          </div>
+
+          <div class="alts-box">
+            <div class="alts-header">FUNÇÃO PRINCIPAL:</div>
+            <div class="alt-pills">
+              <span class="alt-pill heal" style="border-color: #a855f7; color: #c084fc; background: rgba(168, 85, 247, 0.15);">🪄 Chanter (Mantras de Ataque, Defesa & Off-Heal)</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -525,6 +575,21 @@
               </select>
             </div>
           </div>
+
+          <!-- Slot Brokenboy -->
+          <div class="slot-box">
+            <div class="slot-header">
+              <span class="slot-player">Brokenboy</span>
+              <span class="slot-type">Main: Chanter</span>
+            </div>
+            <div class="slot-select">
+              <label>Escolher Personagem:</label>
+              <select id="select-brokenboy" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
+                <option value="Brokenboy - Chanter (Buffer/Suporte)" data-role="chanter" selected>🪄 Main: Chanter (Buffer/Suporte)</option>
+                <option value="Brokenboy - Ausente / Não Joga" data-role="none">⚪ Ausente nesta comp</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <!-- Team Synergy Overview -->
@@ -538,6 +603,10 @@
             <div class="synergy-stat">
               <span class="stat-icon">🌿 Healers:</span>
               <span class="stat-count" id="count-heal">1</span>
+            </div>
+            <div class="synergy-stat">
+              <span class="stat-icon">🪄 Chanter:</span>
+              <span class="stat-count" id="count-chanter">1</span>
             </div>
             <div class="synergy-stat">
               <span class="stat-icon">🔮 DPS:</span>
@@ -703,7 +772,7 @@
     <!-- Footer -->
     <footer class="main-footer">
       <div class="footer-content">
-        <p>AION 2 • Static Party Manager | Criado para <strong>Kharnoxy</strong>, <strong>CIROC</strong>, <strong>Hell</strong> & <strong>Rafaxdwar</strong></p>
+        <p>AION 2 • Static Party Manager | Criado para <strong>Kharnoxy</strong>, <strong>CIROC</strong>, <strong>Hell</strong>, <strong>Rafaxdwar</strong> & <strong>Brokenboy</strong></p>
         <span class="footer-meta">DESENVOLVIDO POR - Kharnoxy</span>
       </div>
     </footer>
@@ -748,6 +817,13 @@
             <div class="m-text">
               <strong>Rafaxdwar</strong>
               <span>Guerreiro (DPS/Flex)</span>
+            </div>
+          </div>
+          <div class="member-radio-card" data-player="brokenboy" onclick="AionAgenda.selectLoginPlayer('brokenboy')">
+            <div class="m-avatar">🪄</div>
+            <div class="m-text">
+              <strong>Brokenboy</strong>
+              <span>Chanter (Suporte/Buffer)</span>
             </div>
           </div>
         </div>

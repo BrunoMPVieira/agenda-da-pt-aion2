@@ -25,6 +25,7 @@ O sistema conta com autenticação individual para os 4 integrantes. Ao fazer lo
 | **CIROC** | **Mago** 🔮 (DPS) | Chega às 15:00 do trabalho presencial. Tarde/Noite livre. FDS flexível. | 🌿 2 Healers / 🔮 1 Mago | `xandom` |
 | **Hell** | **Healer** 🌿 (Suporte) | Aposentado. Livre o dia todo, **exceto das 22:00 às 00:00** (Raven Online). | 🌿 1 Healer / 🔮 1 Mago | `hellgay` |
 | **Rafaxdwar** | **Guerreiro** ⚔️ (DPS/Flex) | Streamer e pai de família. **19:00** é o horário sagrado de jogo. FDS livre. | 🛡️ 1 Templário / ⚔️ 1 Gladiador | `pintodebolivia` |
+| **Brokenboy** | **Chanter** 🪄 (Buffer/Suporte) | 12:00 às 22:00. **Qua & Qui joga a partir das 21:00 (9h da noite)**. FDS a partir das 14:00. | 🪄 Chanter (Mantras & Buffs) | `brokenbboy99` |
 
 *(As senhas podem ser facilmente modificadas na tabela `members_auth` no Supabase ou via modal).*
 
