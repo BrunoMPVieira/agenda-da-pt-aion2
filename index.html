@@ -34,14 +34,8 @@
         </div>
       </div>
 
-      <!-- Top Tools: Realtime Cloud Status, Windows Alarm & User Login -->
+      <!-- Top Tools: Windows Alarm & User Login -->
       <div class="header-controls">
-        <!-- Realtime Cloud Connection Status -->
-        <button class="control-btn db-btn" onclick="AionAgenda.openSyncInfoModal()" title="Status da Nuvem e Banco de Dados Automático">
-          <span class="status-indicator connected" id="db-status-dot"></span>
-          <span id="db-status-label">Nuvem: Conectada 🟢</span>
-        </button>
-
         <!-- Windows Alarm Toggle & Test -->
         <div class="alarm-controls-box">
           <button id="alarm-toggle-btn" class="control-btn alarm-btn active" onclick="AionAgenda.toggleWindowsAlarm()" title="Ativar/Desativar apito no Windows">
@@ -639,7 +633,7 @@
         <div class="presence-box">
           <div class="box-title-row">
             <h3>PAINEL DE PRESENÇA EM TEMPO REAL</h3>
-            <span class="live-sync-badge">⚡ Sincronizado via Supabase</span>
+            <span class="live-sync-badge">⚡ Tempo Real Ativo</span>
           </div>
 
           <div class="presence-list" id="presence-live-list">
@@ -769,48 +763,6 @@
       <div class="modal-footer">
         <button class="btn-cancel" onclick="AionAgenda.closeLoginModal()">Cancelar</button>
         <button class="btn-submit" onclick="AionAgenda.submitLogin()">Entrar na Conta</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================================
-       MODAL 2: STATUS DA NUVEM & BANCO AUTOMÁTICO
-       =================================================================== -->
-  <div id="config-modal" class="modal-backdrop">
-    <div class="modal-card config-modal-card">
-      <div class="modal-header">
-        <h3>⚡ NUVEM & BANCO AUTOMÁTICO DA PT</h3>
-        <button class="modal-close" onclick="AionAgenda.closeConfigModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <p class="modal-desc">
-          O sistema conta com <strong>Sincronização Automática em Nuvem</strong> integrada! Tudo o que você e seus amigos confirmarem (presenças, anotações e dungeons) é sincronizado em tempo real sem precisar de configuração manual.
-        </p>
-
-        <div class="setup-sql-callout">
-          <strong>🟢 Status dos Motores de Dados:</strong>
-          <ul style="margin-top:6px; padding-left:20px; font-size:0.85rem; line-height:1.6;">
-            <li><strong>Nuvem Descentralizada (GunDB):</strong> <span style="color:#4ef090;">Ativa e Conectada 🟢</span> (sincroniza entre navegadores pela internet sem chaves).</li>
-            <li><strong>Servidor Local (Node.js):</strong> Execute <code>INICIAR_AGENDA.bat</code> se desejar rodar o servidor em sua rede local.</li>
-            <li><strong>Supabase (Opcional):</strong> Pode ser vinculado caso queira usar sua própria instância personalizada.</li>
-          </ul>
-        </div>
-
-        <div class="form-group" style="margin-top: 10px;">
-          <label for="cfg-supabase-url">Supabase URL (Opcional / Avançado):</label>
-          <input type="text" id="cfg-supabase-url" placeholder="https://seu-projeto.supabase.co">
-        </div>
-
-        <div class="form-group">
-          <label for="cfg-supabase-key">Supabase Anon Key (Opcional / Avançado):</label>
-          <input type="password" id="cfg-supabase-key" placeholder="Deixe em branco para usar a Nuvem Automática padrão">
-        </div>
-
-        <div id="cfg-status-msg" class="cfg-status-msg"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="AionAgenda.closeConfigModal()">Fechar</button>
-        <button class="btn-submit" onclick="AionAgenda.saveSupabaseConfig()">Salvar Ajustes</button>
       </div>
     </div>
   </div>

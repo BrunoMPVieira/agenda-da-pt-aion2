@@ -216,20 +216,17 @@ const AionAgenda = (() => {
   function initSupabase() {
     if (!window.supabase) {
       console.warn('SDK do Supabase não carregado.');
-      updateDbStatusUI('Supabase: Carregando...', false);
       return;
     }
 
     try {
       supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY);
-      updateDbStatusUI('Supabase: Conectado 🟢', true);
       console.log('Conectado ao Supabase com sucesso!');
 
       // Realtime listener para Presença e Avisos
       subscribeRealtime();
     } catch (e) {
       console.error('Erro ao conectar ao Supabase:', e);
-      updateDbStatusUI('Supabase: Erro de Conexão 🔴', false);
     }
   }
 
@@ -251,24 +248,6 @@ const AionAgenda = (() => {
     } catch (e) {
       console.warn('Realtime subscription error:', e);
     }
-  }
-
-  function updateDbStatusUI(label, connected) {
-    const dot = document.getElementById('db-status-dot');
-    const lbl = document.getElementById('db-status-label');
-    if (dot) dot.className = connected ? 'status-indicator connected' : 'status-indicator fallback';
-    if (lbl) lbl.textContent = label;
-  }
-
-  function openSyncInfoModal() {
-    const modal = document.getElementById('config-modal');
-    if (modal) modal.classList.add('open');
-    playClick();
-  }
-
-  function closeConfigModal() {
-    const modal = document.getElementById('config-modal');
-    if (modal) modal.classList.remove('open');
   }
 
   // ===================================================================
@@ -305,7 +284,7 @@ const AionAgenda = (() => {
       }
 
       if (actionGreeting) actionGreeting.textContent = `Olá, ${loggedUser.name}! Confirme seu status de hoje:`;
-      if (actionSub) actionSub.textContent = `Classe: ${loggedUser.class} • Salvo no Supabase e visível para toda a PT`;
+      if (actionSub) actionSub.textContent = `Classe: ${loggedUser.class} • Sincronizado em tempo real para toda a PT`;
       if (actionLoginBtn) actionLoginBtn.style.display = 'none';
       if (actionBody) actionBody.classList.remove('disabled');
 
@@ -359,7 +338,7 @@ const AionAgenda = (() => {
       return;
     }
 
-    if (errEl) errEl.textContent = 'Verificando senha no Supabase...';
+    if (errEl) errEl.textContent = 'Verificando senha...';
 
     let authSuccess = false;
     let memberData = MEMBERS[selectedLoginId];
@@ -439,7 +418,7 @@ const AionAgenda = (() => {
     const statusMsg = document.getElementById('save-status-msg');
     const nowIso = new Date().toISOString();
 
-    if (statusMsg) statusMsg.textContent = 'Salvando no Supabase...';
+    if (statusMsg) statusMsg.textContent = 'Salvando presença...';
 
     // 1. Salvar no cache local
     let cache = {};
@@ -467,9 +446,9 @@ const AionAgenda = (() => {
 
         if (error) {
           console.error('Erro Supabase upsert:', error);
-          if (statusMsg) statusMsg.textContent = '⚠️ Salvo localmente (erro Supabase).';
+          if (statusMsg) statusMsg.textContent = '⚠️ Salvo localmente.';
         } else {
-          if (statusMsg) statusMsg.textContent = '✅ Salvo e sincronizado no Supabase!';
+          if (statusMsg) statusMsg.textContent = '✅ Salvo e sincronizado em tempo real!';
         }
       } catch (err) {
         console.error('Falha de rede Supabase:', err);
@@ -1033,8 +1012,6 @@ const AionAgenda = (() => {
     toggleSound,
     toggleWindowsAlarm,
     testWindowsAlarm,
-    openSyncInfoModal,
-    closeConfigModal,
     openLoginModal,
     closeLoginModal,
     selectLoginPlayer,
