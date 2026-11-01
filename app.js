@@ -715,22 +715,34 @@ const AionAgenda = (() => {
   }
 
   // ===================================================================
-  // NAVIGATION TABS
+  // NAVIGATION TABS (DESKTOP & MOBILE BOTTOM BAR)
   // ===================================================================
   function initTabs() {
-    const tabButtons = document.querySelectorAll('.nav-pill');
-    tabButtons.forEach(btn => {
+    const allTabTriggers = document.querySelectorAll('.nav-pill, .m-nav-item');
+    allTabTriggers.forEach(btn => {
       btn.addEventListener('click', () => {
         playClick();
         const tabId = btn.getAttribute('data-tab');
-        tabButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if (!tabId) return;
+
+        allTabTriggers.forEach(b => {
+          if (b.getAttribute('data-tab') === tabId) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
 
         document.querySelectorAll('.tab-content').forEach(section => {
           section.classList.remove('active');
         });
         const targetSection = document.getElementById(`tab-${tabId}`);
-        if (targetSection) targetSection.classList.add('active');
+        if (targetSection) {
+          targetSection.classList.add('active');
+          if (window.innerWidth <= 768) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
       });
     });
   }

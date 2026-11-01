@@ -148,6 +148,22 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 18px var(--color-primary-glow);
+  transition: transform 0.3s ease;
+}
+
+.logo-shield:hover {
+  transform: scale(1.05);
+}
+
+.header-wings-svg {
+  width: 38px;
+  height: 38px;
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.65));
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-icon {
@@ -717,6 +733,90 @@ body {
   gap: 16px;
 }
 
+/* Class Crests (Original Class Symbols) */
+.avatar-crest {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 15, 28, 0.75);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-crest::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.class-svg-icon {
+  width: 32px;
+  height: 32px;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.member-card:hover .avatar-crest .class-svg-icon {
+  transform: scale(1.15);
+}
+
+/* Modal Crests */
+.m-crest {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 15, 28, 0.75);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.m-crest .class-svg-icon {
+  width: 26px;
+  height: 26px;
+}
+
+/* Class Crest Variants */
+.tank-crest {
+  border: 2px solid #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(29, 78, 216, 0.12));
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
+}
+
+.dps-crest {
+  border: 2px solid #00e5ff;
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.22), rgba(6, 182, 212, 0.12));
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.4);
+}
+
+.heal-crest {
+  border: 2px solid #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(4, 120, 87, 0.12));
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+}
+
+.gladiator-crest {
+  border: 2px solid #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(185, 28, 28, 0.12));
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+}
+
+.chanter-crest {
+  border: 2px solid #c084fc;
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.22), rgba(126, 34, 206, 0.12));
+  box-shadow: 0 0 16px rgba(192, 132, 252, 0.4);
+}
+
 .avatar-ring {
   width: 58px;
   height: 58px;
@@ -756,6 +856,8 @@ body {
 .badge-role.tank { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
 .badge-role.heal { background: rgba(46, 213, 115, 0.2); color: var(--color-heal); border: 1px solid var(--color-heal); }
 .badge-role.dps { background: rgba(0, 229, 255, 0.2); color: var(--color-primary); border: 1px solid var(--color-primary); }
+.badge-role.glad { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+.badge-role.chanter { background: rgba(192, 132, 252, 0.2); color: #d8b4fe; border: 1px solid #c084fc; }
 
 .badge-you {
   background: var(--color-gold);
@@ -840,6 +942,9 @@ body {
 .alt-pill.dps { background: rgba(0, 229, 255, 0.12); color: var(--color-primary); border: 1px solid rgba(0, 229, 255, 0.3); }
 .alt-pill.heal { background: rgba(46, 213, 115, 0.12); color: var(--color-heal); border: 1px solid rgba(46, 213, 115, 0.3); }
 .alt-pill.tank { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+.alt-pill.glad { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+.alt-pill.chanter { background: rgba(192, 132, 252, 0.15); color: #d8b4fe; border: 1px solid rgba(192, 132, 252, 0.35); }
+.alt-pill.no-alt { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px dashed rgba(239, 68, 68, 0.4); font-weight: 600; }
 
 /* ===================================================================
    TAB 3: SIMULADOR DE COMPOSIÇÃO DE ALTS
@@ -1807,14 +1912,24 @@ body {
   text-transform: uppercase;
 }
 
-/* Responsive adjustments */
+/* ===================================================================
+   MOBILE BOTTOM NAVIGATION BAR
+   =================================================================== */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* ===================================================================
+   RESPONSIVE DESIGN & MOBILE ADAPTATION
+   =================================================================== */
 @media (max-width: 900px) {
   .app-container {
     padding: 16px;
   }
   .main-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 16px;
   }
   .header-controls {
     width: 100%;
@@ -1823,5 +1938,267 @@ body {
   .header-status-card {
     width: 100%;
     justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Extra bottom padding for comfortable thumb scrolling with fixed bottom nav */
+  .app-container {
+    padding: 12px 12px 90px;
+    gap: 16px;
+  }
+
+  /* Compact MMORPG Header on Mobile */
+  .main-header {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .header-brand {
+    gap: 12px;
+  }
+
+  .header-brand h1 {
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+
+  .sub-badge {
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+  }
+
+  .logo-shield {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+
+  .header-wings-svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .header-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .alarm-controls-box {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .control-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    justify-content: center;
+  }
+
+  .auth-box {
+    width: 100%;
+  }
+
+  .auth-box .login-btn,
+  .user-badge {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .header-status-card {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pt-active-summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Hide desktop horizontal tabs on mobile in favor of thumb-friendly bottom nav */
+  .desktop-nav {
+    display: none !important;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 66px;
+    background: rgba(8, 12, 22, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 229, 255, 0.25);
+    z-index: 9999;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 4px calc(env(safe-area-inset-bottom, 0px) + 2px);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.8);
+  }
+
+  .m-nav-item {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+    height: 100%;
+    padding: 4px 0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: 8px;
+  }
+
+  .m-nav-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .m-nav-label {
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .m-nav-item:active {
+    transform: scale(0.92);
+  }
+
+  .m-nav-item.active {
+    color: var(--color-primary);
+  }
+
+  .m-nav-item.active .m-nav-icon {
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.8));
+  }
+
+  /* Grid layouts collapse to single column on mobile */
+  .days-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .members-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .member-card {
+    padding: 16px;
+  }
+
+  .builder-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .builder-presets {
+    flex-direction: column;
+  }
+
+  .builder-presets .btn-preset {
+    width: 100%;
+  }
+
+  .checkin-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .status-options-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .status-opt-btn {
+    min-height: 52px;
+    padding: 10px 14px;
+  }
+
+  .announcements-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .section-title-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .section-title-bar h2 {
+    font-size: 1.25rem;
+  }
+
+  /* Modals on mobile */
+  .modal-card {
+    width: 95%;
+    max-width: 480px;
+    max-height: 90vh;
+    padding: 0;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .member-select-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .member-radio-card {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 8px 8px 85px;
+  }
+
+  .main-header {
+    padding: 12px;
+  }
+
+  .header-brand h1 {
+    font-size: 1.2rem;
+  }
+
+  .day-card {
+    border-radius: var(--radius-sm);
+  }
+
+  .avatar-crest {
+    width: 50px;
+    height: 50px;
+  }
+
+  .class-svg-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .m-nav-label {
+    font-size: 0.65rem;
   }
 }

@@ -2,15 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda da PT - AION 2 | Cronograma & Gestão</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Agenda da PT - AION 2 | Central dos Daevas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- GunDB Realtime Peer-to-Peer Cloud Database (Zero Setup) -->
-  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,9 +24,18 @@
     <header class="main-header">
       <div class="header-brand">
         <div class="logo-shield">
-          <span class="logo-icon">⚔️</span>
+          <svg class="header-wings-svg" viewBox="0 0 40 40" fill="none">
+            <path d="M20 4c-3 8-12 12-18 13 4 5 10 8 18 19 8-11 14-14 18-19-6-1-15-5-18-13z" fill="url(#wingGrad)" stroke="#00e5ff" stroke-width="1.6"/>
+            <circle cx="20" cy="18" r="3.5" fill="#ffd000"/>
+            <defs>
+              <linearGradient id="wingGrad" x1="20" y1="4" x2="20" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#00e5ff" stop-opacity="0.8"/>
+                <stop offset="1" stop-color="#7c3aed" stop-opacity="0.35"/>
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
-        <div>
+        <div class="brand-info">
           <div class="sub-badge">CENTRAL DE OPERAÇÕES • ATREIA</div>
           <h1>AGENDA DA PT <span class="accent-text">AION 2</span></h1>
         </div>
@@ -36,17 +43,15 @@
 
       <!-- Top Tools: Windows Alarm & User Login -->
       <div class="header-controls">
-        <!-- Windows Alarm Toggle & Test -->
         <div class="alarm-controls-box">
           <button id="alarm-toggle-btn" class="control-btn alarm-btn active" onclick="AionAgenda.toggleWindowsAlarm()" title="Ativar/Desativar apito no Windows">
-            🔔 Alarme Windows: ON
+            🔔 Alarme: ON
           </button>
           <button class="control-btn test-btn" onclick="AionAgenda.testWindowsAlarm()" title="Testar apito sonoro e notificação no Windows">
             🔊 Testar Apito
           </button>
         </div>
 
-        <!-- User Login Pill / Button -->
         <div id="auth-box" class="auth-box">
           <button class="control-btn login-btn" onclick="AionAgenda.openLoginModal()">
             🔑 Entrar como Jogador
@@ -54,6 +59,7 @@
         </div>
       </div>
 
+      <!-- Live Clock & Status Card -->
       <div class="header-status-card">
         <div class="live-clock-box">
           <span class="live-dot"></span>
@@ -68,18 +74,18 @@
       </div>
     </header>
 
-    <!-- Quick Navigation / Stats Bar -->
-    <nav class="quick-nav">
+    <!-- Desktop Navigation Bar -->
+    <nav class="quick-nav desktop-nav">
       <div class="nav-pills">
         <button class="nav-pill active" data-tab="semana">📅 Cronograma Semanal</button>
-        <button class="nav-pill" data-tab="membros">🛡️ Guerreiros & Alts</button>
-        <button class="nav-pill" data-tab="builder">⚔️ Simulador de PT (Alts)</button>
+        <button class="nav-pill" data-tab="membros">🛡️ Guerreiros da PT (5)</button>
+        <button class="nav-pill" data-tab="builder">⚔️ Simulador de Comps</button>
         <button class="nav-pill" data-tab="checkin">✅ Check-in Diário & DGs</button>
         <button class="nav-pill" data-tab="avisos">📜 Mural de Avisos</button>
       </div>
 
       <div class="sound-toggle-box">
-        <button id="sound-btn" class="icon-btn" onclick="AionAgenda.toggleSound()" title="Alternar efeitos sonoros da página">🔊 Efeitos: ON</button>
+        <button id="sound-btn" class="icon-btn" onclick="AionAgenda.toggleSound()" title="Alternar efeitos sonoros da página">🔊 Sons: ON</button>
       </div>
     </nav>
 
@@ -88,11 +94,12 @@
       <div class="section-title-bar">
         <div>
           <h2>CRONOGRAMA DE OPERAÇÕES DA SEMANA</h2>
-          <p class="section-desc">Grade de compromissos oficiais da PT: Dungeons sagradas, Abismo diário e progressão de Alts.</p>
+          <p class="section-desc">Grade sagrada da PT: Dungeons com os Mains, Abismo diário e progressão de Alts.</p>
         </div>
         <div class="quick-rules-badge">
           <span>🎯 <strong>Horário Nobre:</strong> 19:00</span>
-          <span>🌌 <strong>Abismo em Grupo:</strong> 16:00 (1h)</span>
+          <span>🌌 <strong>Abismo:</strong> 16:00 (1h)</span>
+          <span>🪄 <strong>Brokenboy:</strong> Qua/Qui às 21h</span>
         </div>
       </div>
 
@@ -110,19 +117,19 @@
               <span class="event-time">16:00</span>
               <div class="event-info">
                 <strong>Abismo em Grupo</strong>
-                <span>Foco: 1 hora de farm / PvP rápido</span>
+                <span>Foco: 1 hora de farm / PvP</span>
               </div>
             </div>
             <div class="event-item alts">
               <span class="event-time highlight">19:00</span>
               <div class="event-info">
                 <strong>UPAR ALTS EM GRUPO 🚀</strong>
-                <span>Missões de grupo, grind e leveling dos alts</span>
+                <span>Grind e nivelamento dos secundários</span>
               </div>
             </div>
           </div>
           <div class="day-footer">
-            <span class="presence-hint">PT Completa às 19h</span>
+            <span class="presence-hint">PT Base às 19:00</span>
           </div>
         </div>
 
@@ -138,19 +145,19 @@
               <span class="event-time">16:00</span>
               <div class="event-info">
                 <strong>Abismo em Grupo</strong>
-                <span>Foco: AP Farm & Quest diária</span>
+                <span>Foco: AP Farm & Quests</span>
               </div>
             </div>
             <div class="event-item alts">
               <span class="event-time highlight">19:00</span>
               <div class="event-info">
                 <strong>UPAR ALTS EM GRUPO 🚀</strong>
-                <span>Alinhamento de nível e preparo para reset</span>
+                <span>Preparação final para o reset semanal</span>
               </div>
             </div>
           </div>
           <div class="day-footer">
-            <span class="presence-hint">PT Completa às 19h</span>
+            <span class="presence-hint">PT Base às 19:00</span>
           </div>
         </div>
 
@@ -173,19 +180,19 @@
               <span class="event-time highlight-dg">19:00</span>
               <div class="event-info">
                 <strong>DUNGEONS OFICIAIS DA PT 🏰</strong>
-                <span>Rotação de Mains: Kharnoxy, Hell, CIROC & Rafax</span>
+                <span>Rush dos Mains: Kharnoxy, Hell, CIROC e Rafax</span>
               </div>
             </div>
-            <div class="event-item chanter-event" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.35);">
-              <span class="event-time" style="color: #c084fc;">21:00</span>
+            <div class="event-item chanter-event">
+              <span class="event-time highlight-chanter">21:00</span>
               <div class="event-info">
-                <strong style="color: #e9d5ff;">Brokenboy Entra na PT 🪄</strong>
-                <span>Reforço com Mantras & Buffs de Chanter</span>
+                <strong>Brokenboy Entra na PT 🪄</strong>
+                <span>Mantras, buffs e reforço de Chanter</span>
               </div>
             </div>
           </div>
           <div class="day-footer prime">
-            <span class="presence-hint">Presença Obrigatória (Mains + Chanter às 21h)</span>
+            <span class="presence-hint">Presença Obrigatória (Mains + Chanter 21h)</span>
           </div>
         </div>
 
@@ -208,19 +215,19 @@
               <span class="event-time highlight-dg">19:00</span>
               <div class="event-info">
                 <strong>DUNGEONS OFICIAIS DA PT 🏰</strong>
-                <span>Farm de drops raros & progressão end-game</span>
+                <span>Farm de itens épicos & bosses</span>
               </div>
             </div>
-            <div class="event-item chanter-event" style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.35);">
-              <span class="event-time" style="color: #c084fc;">21:00</span>
+            <div class="event-item chanter-event">
+              <span class="event-time highlight-chanter">21:00</span>
               <div class="event-info">
-                <strong style="color: #e9d5ff;">Brokenboy Entra na PT 🪄</strong>
-                <span>Reforço com Mantras & Buffs de Chanter</span>
+                <strong>Brokenboy Entra na PT 🪄</strong>
+                <span>Mantras, buffs e reforço de Chanter</span>
               </div>
             </div>
           </div>
           <div class="day-footer prime">
-            <span class="presence-hint">Presença Obrigatória (Mains + Chanter às 21h)</span>
+            <span class="presence-hint">Presença Obrigatória (Mains + Chanter 21h)</span>
           </div>
         </div>
 
@@ -236,14 +243,14 @@
               <span class="event-time">16:00</span>
               <div class="event-info">
                 <strong>Abismo em Grupo</strong>
-                <span>Aquecimento pré-dungeon</span>
+                <span>Aquecimento da PT</span>
               </div>
             </div>
             <div class="event-item dungeon">
               <span class="event-time highlight-dg">19:00</span>
               <div class="event-info">
                 <strong>DUNGEONS OFICIAIS (SEXTOU) 🏰🍻</strong>
-                <span>Fechamento do bloco semanal de DGs principais</span>
+                <span>Fechamento do bloco semanal dos Mains</span>
               </div>
             </div>
           </div>
@@ -265,15 +272,15 @@
               <p><strong>Kharnoxy & CIROC:</strong> Podem sair ou estar off.</p>
             </div>
             <div class="event-item free">
-              <span class="event-time">LIVRE</span>
+              <span class="event-time">14:00+</span>
               <div class="event-info">
-                <strong>Up de Alts / Farm Solo</strong>
-                <span>Hell & Rafax lideram conteúdo solo ou up de alts</span>
+                <strong>Brokenboy ON a partir das 14h</strong>
+                <span>Hell, Rafax & Broken farmam alts ou solo</span>
               </div>
             </div>
           </div>
           <div class="day-footer">
-            <span class="presence-hint">Se todos estiverem ON: Bônus Run</span>
+            <span class="presence-hint">Se todos logarem: Bônus Run</span>
           </div>
         </div>
 
@@ -290,7 +297,7 @@
               <p><strong>Kharnoxy & CIROC:</strong> Podem sair ou estar off.</p>
             </div>
             <div class="event-item free">
-              <span class="event-time">LIVRE</span>
+              <span class="event-time">14:00+</span>
               <div class="event-info">
                 <strong>Crafting & Preparação</strong>
                 <span>Alts, mercado, farm e organizar a próxima semana</span>
@@ -304,27 +311,33 @@
       </div>
     </section>
 
-    <!-- TAB 2: MEMBROS & ALTS -->
+    <!-- TAB 2: MEMBROS & CLASSES ORIGINAIS -->
     <section id="tab-membros" class="tab-content">
       <div class="section-title-bar">
         <div>
-          <h2>FORMAÇÃO DA PT: OS 4 JOGADORES</h2>
-          <p class="section-desc">Rotina da vida real, horários disponíveis, restrições e catálogo de personagens.</p>
+          <h2>OS 5 GUERREIROS DA PT: CLASSES & ROTINA</h2>
+          <p class="section-desc">Identidade original de classe em AION, disponibilidade, restrições e catálogo de Alts.</p>
         </div>
       </div>
 
       <div class="members-grid">
-        <!-- KHARNOXY -->
+        <!-- 1. KHARNOXY -->
         <div class="member-card you-card">
           <div class="member-card-header">
-            <div class="avatar-ring tank-ring">🛡️</div>
+            <div class="avatar-crest tank-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 5v6.5C4 16.5 7.5 20.5 12 22c4.5-1.5 8-5.5 8-10.5V5l-8-3z" fill="rgba(59, 130, 246, 0.25)" stroke="#60a5fa" stroke-width="1.8"/>
+                <path d="M12 7v10M8.5 10.5h7" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="12" cy="10.5" r="1.5" fill="#60a5fa"/>
+              </svg>
+            </div>
             <div class="member-titles">
               <div class="tag-row">
                 <span class="badge-role tank">TANK MAIN</span>
                 <span class="badge-you">VOCÊ</span>
               </div>
               <h3>Kharnoxy</h3>
-              <span class="class-label">Templário (Tanker)</span>
+              <span class="class-label">Templário (Tank / Escudo)</span>
             </div>
           </div>
 
@@ -339,7 +352,7 @@
             </div>
             <div class="info-row warning-row">
               <span class="info-label">⚠️ Atenção:</span>
-              <span class="info-val">Às vezes precisa ir presencial ao escritório. Sáb/Dom pode sair.</span>
+              <span class="info-val">Às vezes precisa ir ao escritório presencial. Sáb/Dom pode sair.</span>
             </div>
           </div>
 
@@ -352,23 +365,29 @@
           </div>
         </div>
 
-        <!-- CIROC -->
+        <!-- 2. CIROC -->
         <div class="member-card">
           <div class="member-card-header">
-            <div class="avatar-ring dps-ring">🔮</div>
+            <div class="avatar-crest dps-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5L12 2z" fill="rgba(0, 229, 255, 0.2)" stroke="#00e5ff" stroke-width="1.8"/>
+                <circle cx="12" cy="12" r="3" fill="#38bdf8" stroke="#fff" stroke-width="1.5"/>
+                <path d="M7 7l10 10M17 7l-10 10" stroke="rgba(255,255,255,0.4)" stroke-dasharray="1 2"/>
+              </svg>
+            </div>
             <div class="member-titles">
               <div class="tag-row">
-                <span class="badge-role dps">DPS MAIN</span>
+                <span class="badge-role dps">DPS BURST MAIN</span>
               </div>
               <h3>CIROC</h3>
-              <span class="class-label">Mago (Sorcerer / Burst)</span>
+              <span class="class-label">Mago (Sorcerer / Fogo & Gelo)</span>
             </div>
           </div>
 
           <div class="member-info-section">
             <div class="info-row">
               <span class="info-label">💼 Vida Real:</span>
-              <span class="info-val">Trabalho Presencial (Chega 15:00)</span>
+              <span class="info-val">Trabalho Presencial (Chega 15h)</span>
             </div>
             <div class="info-row">
               <span class="info-label">⏰ Disponibilidade:</span>
@@ -389,16 +408,22 @@
           </div>
         </div>
 
-        <!-- HELL -->
+        <!-- 3. HELL -->
         <div class="member-card">
           <div class="member-card-header">
-            <div class="avatar-ring heal-ring">🌿</div>
+            <div class="avatar-crest heal-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3v18M6 8h12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+                <path d="M4 14c2-4 5-6 8-6s6 2 8 6" stroke="#10b981" stroke-width="1.8" fill="rgba(16, 185, 129, 0.2)"/>
+                <circle cx="12" cy="5" r="2.5" fill="#6ee7b7" stroke="#10b981" stroke-width="1.5"/>
+              </svg>
+            </div>
             <div class="member-titles">
               <div class="tag-row">
-                <span class="badge-role heal">HEALER MAIN</span>
+                <span class="badge-role heal">HEALER PRINCIPAL</span>
               </div>
               <h3>Hell</h3>
-              <span class="class-label">Healer (Clérigo / Suporte)</span>
+              <span class="class-label">Healer (Clérigo / Cura & Luz)</span>
             </div>
           </div>
 
@@ -413,7 +438,7 @@
             </div>
             <div class="info-row restriction-row">
               <span class="info-label">🚫 Bloqueio Fixo:</span>
-              <span class="info-val"><strong>22:00 às 00:00</strong> (Joga Raven Online)</span>
+              <span class="info-val"><strong>22:00 às 00:00</strong> (Raven Online)</span>
             </div>
           </div>
 
@@ -426,16 +451,22 @@
           </div>
         </div>
 
-        <!-- RAFAXDWAR -->
+        <!-- 4. RAFAXDWAR -->
         <div class="member-card">
           <div class="member-card-header">
-            <div class="avatar-ring dps-ring">⚔️</div>
+            <div class="avatar-crest gladiator-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M14.5 4l5.5 5.5-10 10-4 1 1-4 7.5-7.5" stroke="#f87171" stroke-width="1.8" fill="rgba(239, 68, 68, 0.2)"/>
+                <path d="M9.5 4L4 9.5l10 10 4 1-1-4-7.5-7.5" stroke="#ef4444" stroke-width="1.8" fill="rgba(239, 68, 68, 0.15)"/>
+                <path d="M12 3l1.5 3-3 1.5L12 3z" fill="#fca5a5"/>
+              </svg>
+            </div>
             <div class="member-titles">
               <div class="tag-row">
-                <span class="badge-role dps">DPS / FLEX</span>
+                <span class="badge-role glad">GUERREIRO / STREAMER</span>
               </div>
               <h3>Rafaxdwar</h3>
-              <span class="class-label">Guerreiro & Streamer</span>
+              <span class="class-label">Gladiador (DPS Melee & Área)</span>
             </div>
           </div>
 
@@ -450,35 +481,46 @@
             </div>
             <div class="info-row">
               <span class="info-label">📅 Finais de Semana:</span>
-              <span class="info-val">Disponível para upar alts e farmar.</span>
+              <span class="info-val">Disponível para upar alts e farmar</span>
             </div>
           </div>
 
           <div class="alts-box">
             <div class="alts-header">PERSONAGENS ALTS:</div>
             <div class="alt-pills">
+              <span class="alt-pill chanter">🪄 1x Chanter</span>
               <span class="alt-pill tank">🛡️ 1x Templário</span>
-              <span class="alt-pill dps">⚔️ 1x Gladiador</span>
             </div>
           </div>
         </div>
 
-        <!-- BROKENBOY -->
+        <!-- 5. BROKENBOY -->
         <div class="member-card">
           <div class="member-card-header">
-            <div class="avatar-ring heal-ring" style="border-color: #a855f7; box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);">🪄</div>
+            <div class="avatar-crest chanter-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 22V6" stroke="#c084fc" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 8a4 4 0 018 0c0 2.5-4 4.5-4 4.5S8 10.5 8 8z" fill="rgba(192, 132, 252, 0.25)" stroke="#a855f7" stroke-width="1.8"/>
+                <circle cx="12" cy="4" r="2" fill="#e9d5ff" stroke="#a855f7" stroke-width="1.5"/>
+                <path d="M4 11c2-1 4-1 6 0M14 11c2-1 4-1 6 0" stroke="#d8b4fe" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </div>
             <div class="member-titles">
               <div class="tag-row">
-                <span class="badge-role" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7;">CHANTER / BUFFER</span>
+                <span class="badge-role chanter">CHANTER BUFFER</span>
               </div>
               <h3>Brokenboy</h3>
-              <span class="class-label">Chanter (Buffs, Mantras & Suporte)</span>
+              <span class="class-label">Chanter (Buffs, Mantras & Off-Heal)</span>
             </div>
           </div>
 
           <div class="member-info-section">
             <div class="info-row">
-              <span class="info-label">💼 Horário Geral:</span>
+              <span class="info-label">💼 Vida Real:</span>
+              <span class="info-val">Faz Faculdade 🎓 (Estudante)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">⏰ Horário Geral:</span>
               <span class="info-val">12:00 às 22:00 (Meio-dia às 10 da noite)</span>
             </div>
             <div class="info-row warning-row">
@@ -492,9 +534,9 @@
           </div>
 
           <div class="alts-box">
-            <div class="alts-header">FUNÇÃO PRINCIPAL:</div>
+            <div class="alts-header">PERSONAGENS ALTS:</div>
             <div class="alt-pills">
-              <span class="alt-pill heal" style="border-color: #a855f7; color: #c084fc; background: rgba(168, 85, 247, 0.15);">🪄 Chanter (Mantras de Ataque, Defesa & Off-Heal)</span>
+              <span class="alt-pill no-alt">❌ Não tem Alts (Foco 100% no Main Chanter)</span>
             </div>
           </div>
         </div>
@@ -505,8 +547,8 @@
     <section id="tab-builder" class="tab-content">
       <div class="section-title-bar">
         <div>
-          <h2>SIMULADOR DE COMPOSIÇÃO DE ALTS (SEG & TER)</h2>
-          <p class="section-desc">Nos dias de Alts (ou FDS), monte a rotação perfeita de 4 pessoas balanceando Tank, Healer e DPS.</p>
+          <h2>SIMULADOR DE COMPOSIÇÃO DE PT (ALTS & MAINS)</h2>
+          <p class="section-desc">Monte a rotação de 4 a 5 pessoas garantindo Tank, Healer, Chanter e DPS.</p>
         </div>
       </div>
 
@@ -565,12 +607,13 @@
           <div class="slot-box">
             <div class="slot-header">
               <span class="slot-player">Rafaxdwar</span>
-              <span class="slot-type">Main: DPS</span>
+              <span class="slot-type">Main: Gladiador (DPS)</span>
             </div>
             <div class="slot-select">
               <label>Escolher Personagem:</label>
               <select id="select-rafax" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
-                <option value="Rafaxdwar - Gladiador (DPS/Off-Tank)" data-role="dps">⚔️ Alt: Gladiador (DPS)</option>
+                <option value="Rafaxdwar - Gladiador (DPS)" data-role="dps">⚔️ Main: Gladiador (DPS)</option>
+                <option value="Rafaxdwar - Chanter (Buffer)" data-role="chanter">🪄 Alt: Chanter (Buffer)</option>
                 <option value="Rafaxdwar - Templário (Tank)" data-role="tank" selected>🛡️ Alt: Templário (Tank)</option>
               </select>
             </div>
@@ -580,13 +623,13 @@
           <div class="slot-box">
             <div class="slot-header">
               <span class="slot-player">Brokenboy</span>
-              <span class="slot-type">Main: Chanter</span>
+              <span class="slot-type">Main: Chanter (Sem Alts)</span>
             </div>
             <div class="slot-select">
               <label>Escolher Personagem:</label>
               <select id="select-brokenboy" class="role-selector" onchange="AionAgenda.updateTeamBuild()">
                 <option value="Brokenboy - Chanter (Buffer/Suporte)" data-role="chanter" selected>🪄 Main: Chanter (Buffer/Suporte)</option>
-                <option value="Brokenboy - Ausente / Não Joga" data-role="none">⚪ Ausente nesta comp</option>
+                <option value="Brokenboy - Ausente / Faculdade" data-role="none">🎓 Ausente / Faculdade (Sem Alts)</option>
               </select>
             </div>
           </div>
@@ -615,11 +658,11 @@
           </div>
 
           <div id="synergy-verdict" class="synergy-verdict success">
-            ✅ Formação Balanceada Perfeita! (1 Tank, 1 Healer, 2 DPS)
+            ✅ Formação Equilibrada com Mantras e Buffs!
           </div>
 
           <div class="preset-buttons">
-            <button class="preset-btn" onclick="AionAgenda.loadPreset('main')">Equipe Principal (Mains)</button>
+            <button class="preset-btn" onclick="AionAgenda.loadPreset('main')">Equipe Principal (Mains + Chanter)</button>
             <button class="preset-btn" onclick="AionAgenda.loadPreset('alt1')">Comp Alts 1 (Rafax Tank + CIROC Healer)</button>
             <button class="preset-btn" onclick="AionAgenda.loadPreset('alt2')">Comp Alts 2 (Kharnoxy Tank + Hell Healer)</button>
           </div>
@@ -631,8 +674,8 @@
     <section id="tab-checkin" class="tab-content">
       <div class="section-title-bar">
         <div>
-          <h2>CHECK-IN DIÁRIO DE PRESENÇA (SINCRONIZAÇÃO EM NUVEM)</h2>
-          <p class="section-desc">Faça login com sua senha para confirmar sua presença às 19:00 ou deixe anotações se não puder comparecer. Atualiza em tempo real para toda a PT!</p>
+          <h2>CHECK-IN DIÁRIO DE PRESENÇA (TEMPO REAL)</h2>
+          <p class="section-desc">Faça login com seu personagem para confirmar presença às 19h (ou 21h Chanter) ou deixar um recado.</p>
         </div>
       </div>
 
@@ -684,12 +727,12 @@
             <label class="input-label" for="my-presence-note">
               📝 Recado / Anotação para a PT (caso não possa comparecer ou observação especial):
             </label>
-            <textarea id="my-presence-note" placeholder="Ex: Hoje tenho que ficar até 19:30 no escritório, comecem sem mim ou rushem os alts primeiro..." rows="3"></textarea>
+            <textarea id="my-presence-note" placeholder="Ex: Hoje chego 19:30 por causa do trabalho..." rows="3"></textarea>
           </div>
 
           <div class="action-submit-row">
             <button id="save-presence-btn" class="save-presence-btn" onclick="AionAgenda.submitMyPresence()">
-              💾 SALVAR STATUS & SINCRONIZAR NA NUVEM
+              💾 SALVAR STATUS & SINCRONIZAR
             </button>
             <span id="save-status-msg" class="save-status-msg"></span>
           </div>
@@ -706,7 +749,7 @@
           </div>
 
           <div class="presence-list" id="presence-live-list">
-            <!-- Dynamic Cards for each 4 members injected by JS -->
+            <!-- Dynamic Cards for all 5 members injected by JS -->
           </div>
         </div>
 
@@ -730,7 +773,7 @@
       <div class="section-title-bar">
         <div>
           <h2>MURAL DE AVISOS & REGRAS DA PT</h2>
-          <p class="section-desc">Notas rápidas, divisão de drops, links úteis e avisos para os companheiros de guilda salvos em nuvem.</p>
+          <p class="section-desc">Notas rápidas, divisão de drops, links úteis e avisos para os companheiros de guilda.</p>
         </div>
       </div>
 
@@ -744,9 +787,9 @@
           <ul class="fixed-rules-list">
             <li><strong>1. Respeito ao Horário das 19:00:</strong> Chegar pontual para começar a montar o grupo e entrar nas instâncias sem atraso.</li>
             <li><strong>2. Abismo Diário às 16:00:</strong> Quem puder logar faz a 1 hora diária de abismo em grupo para garantir AP e itens.</li>
-            <li><strong>3. Quarta, Quinta e Sexta:</strong> DIAS SAGRADOS DE DUNGEONS DOS MAINS! Ninguém fura sem aviso prévio.</li>
-            <li><strong>4. Limite do Hell (22:00):</strong> As atividades principais da PT com o Hell devem ser concluídas até 22:00, pois ele tem compromisso no Raven Online.</li>
-            <li><strong>5. Finais de Semana Livres:</strong> Se Kharnoxy e CIROC saírem, Rafax e Hell estão autorizados a fazer alts ou solo sem cobrança.</li>
+            <li><strong>3. Quarta e Quinta (Brokenboy às 21:00):</strong> Chanter junta-se à PT às 21h com mantras e buffs de grupo!</li>
+            <li><strong>4. Limite do Hell (22:00):</strong> As atividades com o Hell encerram às 22:00 devido ao compromisso no Raven Online.</li>
+            <li><strong>5. Finais de Semana Livres:</strong> Se Kharnoxy e CIROC saírem, Hell, Rafax e Brokenboy (a partir das 14h) podem farmar alts ou solo.</li>
           </ul>
         </div>
 
@@ -778,8 +821,32 @@
     </footer>
   </div>
 
+  <!-- Mobile Bottom Navigation Bar (Barra de Polegar para Celular) -->
+  <nav class="mobile-bottom-nav">
+    <button class="m-nav-item active" data-tab="semana">
+      <span class="m-nav-icon">📅</span>
+      <span class="m-nav-label">Semana</span>
+    </button>
+    <button class="m-nav-item" data-tab="membros">
+      <span class="m-nav-icon">🛡️</span>
+      <span class="m-nav-label">PT (5)</span>
+    </button>
+    <button class="m-nav-item" data-tab="builder">
+      <span class="m-nav-icon">⚔️</span>
+      <span class="m-nav-label">Comps</span>
+    </button>
+    <button class="m-nav-item" data-tab="checkin">
+      <span class="m-nav-icon">✅</span>
+      <span class="m-nav-label">Check-in</span>
+    </button>
+    <button class="m-nav-item" data-tab="avisos">
+      <span class="m-nav-icon">📜</span>
+      <span class="m-nav-label">Mural</span>
+    </button>
+  </nav>
+
   <!-- ===================================================================
-       MODAL 1: LOGIN DOS INTEGRANTES DA PT
+       MODAL: LOGIN DOS INTEGRANTES DA PT COM SÍMBOLOS ORIGINAIS
        =================================================================== -->
   <div id="login-modal" class="modal-backdrop">
     <div class="modal-card">
@@ -791,36 +858,70 @@
         <p class="modal-desc">Selecione quem você é na PT e digite sua senha para confirmar presença e deixar recados:</p>
 
         <div class="member-select-grid">
+          <!-- Kharnoxy -->
           <div class="member-radio-card active" data-player="kharnoxy" onclick="AionAgenda.selectLoginPlayer('kharnoxy')">
-            <div class="m-avatar">🛡️</div>
+            <div class="m-crest tank-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 5v6.5C4 16.5 7.5 20.5 12 22c4.5-1.5 8-5.5 8-10.5V5l-8-3z" fill="rgba(59, 130, 246, 0.25)" stroke="#60a5fa" stroke-width="1.8"/>
+                <path d="M12 7v10M8.5 10.5h7" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
             <div class="m-text">
               <strong>Kharnoxy</strong>
               <span>Templário (Tank)</span>
             </div>
           </div>
+
+          <!-- CIROC -->
           <div class="member-radio-card" data-player="ciroc" onclick="AionAgenda.selectLoginPlayer('ciroc')">
-            <div class="m-avatar">🔮</div>
+            <div class="m-crest dps-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2l3.5 6.5L22 12l-6.5 3.5L12 22l-3.5-6.5L2 12l6.5-3.5L12 2z" fill="rgba(0, 229, 255, 0.2)" stroke="#00e5ff" stroke-width="1.8"/>
+                <circle cx="12" cy="12" r="3" fill="#38bdf8" stroke="#fff" stroke-width="1.5"/>
+              </svg>
+            </div>
             <div class="m-text">
               <strong>CIROC</strong>
               <span>Mago (DPS)</span>
             </div>
           </div>
+
+          <!-- Hell -->
           <div class="member-radio-card" data-player="hell" onclick="AionAgenda.selectLoginPlayer('hell')">
-            <div class="m-avatar">🌿</div>
+            <div class="m-crest heal-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3v18M6 8h12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="5" r="2.5" fill="#6ee7b7" stroke="#10b981" stroke-width="1.5"/>
+              </svg>
+            </div>
             <div class="m-text">
               <strong>Hell</strong>
               <span>Healer (Suporte)</span>
             </div>
           </div>
+
+          <!-- Rafaxdwar -->
           <div class="member-radio-card" data-player="rafax" onclick="AionAgenda.selectLoginPlayer('rafax')">
-            <div class="m-avatar">⚔️</div>
+            <div class="m-crest gladiator-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M14.5 4l5.5 5.5-10 10-4 1 1-4 7.5-7.5" stroke="#f87171" stroke-width="1.8" fill="rgba(239, 68, 68, 0.2)"/>
+                <path d="M9.5 4L4 9.5l10 10 4 1-1-4-7.5-7.5" stroke="#ef4444" stroke-width="1.8" fill="rgba(239, 68, 68, 0.15)"/>
+              </svg>
+            </div>
             <div class="m-text">
               <strong>Rafaxdwar</strong>
-              <span>Guerreiro (DPS/Flex)</span>
+              <span>Gladiador (DPS)</span>
             </div>
           </div>
+
+          <!-- Brokenboy -->
           <div class="member-radio-card" data-player="brokenboy" onclick="AionAgenda.selectLoginPlayer('brokenboy')">
-            <div class="m-avatar">🪄</div>
+            <div class="m-crest chanter-crest">
+              <svg class="class-svg-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M12 22V6" stroke="#c084fc" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="4" r="2.5" fill="#e9d5ff" stroke="#a855f7" stroke-width="1.5"/>
+              </svg>
+            </div>
             <div class="m-text">
               <strong>Brokenboy</strong>
               <span>Chanter (Suporte/Buffer)</span>
