@@ -2120,19 +2120,16 @@ body {
 /* Footer */
 .main-footer {
   text-align: center;
-  padding-top: 24px;
+  padding: 24px 0 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
-  font-size: 0.85rem;
 }
 
 .footer-meta {
-  display: block;
+  display: inline-block;
   font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   color: var(--color-gold);
-  margin-top: 6px;
   text-transform: uppercase;
 }
 
