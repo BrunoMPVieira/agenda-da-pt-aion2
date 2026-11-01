@@ -26,11 +26,11 @@ const AionAgenda = (() => {
 
   // Predefined Party Members & Credenciais Oficiais
   const MEMBERS = {
-    kharnoxy: { id: 'kharnoxy', name: 'Kharnoxy', class: 'Templário (Tank)', role: 'tank', avatar: '🛡️' },
-    ciroc: { id: 'ciroc', name: 'CIROC', class: 'Mago (DPS)', role: 'dps', avatar: '🔮' },
-    hell: { id: 'hell', name: 'Hell', class: 'Healer (Suporte)', role: 'heal', avatar: '🌿' },
-    rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Guerreiro (DPS/Flex)', role: 'dps', avatar: '⚔️' },
-    brokenboy: { id: 'brokenboy', name: 'Brokenboy', class: 'Chanter (Suporte/Buffer)', role: 'heal', avatar: '🪄' }
+    kharnoxy: { id: 'kharnoxy', name: 'Kharnoxy', class: 'Templário (Tank)', role: 'tank', avatar: '🛡️', iconImg: 'assets/classes/UT_Class_Templar_Large.webp' },
+    ciroc: { id: 'ciroc', name: 'CIROC', class: 'Mago (DPS)', role: 'dps', avatar: '🔮', iconImg: 'assets/classes/UT_Class_Sorcerer_Large.webp' },
+    hell: { id: 'hell', name: 'Hell', class: 'Clérigo (Suporte)', role: 'heal', avatar: '🌿', iconImg: 'assets/classes/UT_Class_Cleric_Large.webp' },
+    rafax: { id: 'rafax', name: 'Rafaxdwar', class: 'Gladiador (DPS)', role: 'dps', avatar: '⚔️', iconImg: 'assets/classes/UT_Class_Gladiator_Large.webp' },
+    brokenboy: { id: 'brokenboy', name: 'Brokenboy', class: 'Encantador (Buffer)', role: 'heal', avatar: '🪄', iconImg: 'assets/classes/UT_Class_Chanter_Large.webp' }
   };
 
   const DEFAULT_CREDENTIALS = {
@@ -277,7 +277,7 @@ const AionAgenda = (() => {
         authBox.innerHTML = `
           <div class="user-pill">
             <span class="user-pill-info">
-              <span>${loggedUser.avatar || '🛡️'}</span>
+              ${loggedUser.iconImg ? `<img src="${loggedUser.iconImg}" alt="${loggedUser.name}" class="user-badge-icon">` : `<span>${loggedUser.avatar || '🛡️'}</span>`}
               <span class="user-pill-name">${loggedUser.name}</span>
             </span>
             <button class="logout-btn" onclick="AionAgenda.logout()">Sair</button>
@@ -360,7 +360,8 @@ const AionAgenda = (() => {
               id: data.id,
               name: data.display_name,
               class: data.class_name,
-              avatar: data.avatar || '🛡️'
+              avatar: data.avatar || '🛡️',
+              iconImg: MEMBERS[selectedLoginId]?.iconImg || ''
             };
           }
         }
@@ -559,7 +560,9 @@ const AionAgenda = (() => {
       card.innerHTML = `
         <div class="live-presence-header">
           <div class="live-member-info">
-            <span class="live-avatar">${info.avatar}</span>
+            <div class="live-icon-crest ${info.role}-crest">
+              <img src="${info.iconImg}" alt="${info.name}" class="live-class-icon">
+            </div>
             <div class="live-member-name">
               <strong>${info.name}</strong>
               <span>${info.class}</span>
